@@ -89,6 +89,7 @@ class User:
         except ValueError as Err:
             return str(Err)
     
+    
     def update_username(self, new_username: str) -> str:
         """
         Update the username for the user.
