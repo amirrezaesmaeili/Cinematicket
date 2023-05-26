@@ -20,11 +20,11 @@ logger.addHandler(file_handler)
 
 
 class BankAccount(ABC):
-    def __init__(self, owner_name: str, balance: int, password: str, ccv2: str):
+    def __init__(self, owner_name: str, balance: int, password: str, cvv2: str):
         self.owner_name = owner_name
         self._balance = balance
         self._password_hash = self._hash_password(password)
-        self._ccv2 = ccv2
+        self._cvv2 = cvv2
 
     @property
     def balance(self):
@@ -58,8 +58,8 @@ class BankAccount(ABC):
         hashed_password = self._hash_password(password)
         return self._password_hash == hashed_password
 
-    def verify_ccv2(self, ccv2: str) -> bool:
-        return self._ccv2 == ccv2
+    def verify_cvv2(self, cvv2: str) -> bool:
+        return self._cvv2 == cvv2
 
     @staticmethod
     def to_rial(balance):
@@ -70,8 +70,8 @@ class ShahrBankAccount(BankAccount):
     __MINIMUM = 10_000
     __accounts = []
 
-    def __init__(self, owner_name: str, balance: int, password: str, ccv2: str):
-        super().__init__(owner_name, balance, password, ccv2)
+    def __init__(self, owner_name: str, balance: int, password: str, cvv2: str):
+        super().__init__(owner_name, balance, password, cvv2)
         type(self).__accounts.append(self)
 
     def __add__(self, amount: int):
@@ -86,7 +86,7 @@ class ShahrBankAccount(BankAccount):
 
         return super().__sub__(amount)
 
-    def transfer(self, other: "BankAccount", amount: int, password: str, ccv2: str):
+    def transfer(self, other: "BankAccount", amount: int, password: str, cvv2: str):
         if amount < 0:
             logger.error("Raised")
             raise ValueError("Invalid amount")
@@ -95,9 +95,9 @@ class ShahrBankAccount(BankAccount):
             logger.error("Raised")
             raise ValueError("Invalid password")
 
-        if not self.verify_ccv2(ccv2):
+        if not self.verify_cvv2(cvv2):
             logger.error("Raised")
-            raise ValueError("Invalid CCV2")
+            raise ValueError("Invalid cvv2")
 
         self.balance -= (amount - 600)
         other.balance += amount
@@ -114,7 +114,7 @@ class ShahrBankAccount(BankAccount):
                 "owner_name": account.owner_name,
                 "balance": account.balance,
                 "password": account._password_hash,
-                "ccv2": account._ccv2,
+                "cvv2": account._cvv2,
             }
             for account in cls.__accounts
         ]
@@ -130,7 +130,7 @@ class ShahrBankAccount(BankAccount):
                     owner_name=account_data["owner_name"],
                     balance=account_data["balance"],
                     password=account_data["password"],
-                    ccv2=account_data["ccv2"],
+                    cvv2=account_data["cvv2"],
                 )
                 for account_data in data
             ]
