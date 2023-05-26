@@ -1,11 +1,16 @@
 import uuid
 import hashlib
 import json
+from enum import Enum
+
+class UserRoll(Enum):
+    ADMIN = "admin"
+    USER = "user"
 
 class User:
     users = {}
 
-    def __init__(self, username: str, password: str, telephone_number= None) -> None:
+    def __init__(self, username: str, password: str, telephone_number= None,role=UserRoll.USER) -> None:
         """
         Initialize a User object.
 
@@ -18,6 +23,7 @@ class User:
         self._password = password
         self.telephone_number = telephone_number
         self.id = str(uuid.uuid4())
+        self.role = role
 
     def __str__(self) -> str:
         """
