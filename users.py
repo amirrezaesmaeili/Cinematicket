@@ -3,14 +3,14 @@ import hashlib
 import json
 from enum import Enum
 
-class UserRole(Enum):
+class UserRoll(Enum):
     ADMIN = "admin"
     USER = "user"
 
 class User:
     users = {}
 
-    def __init__(self, username: str, password: str, telephone_number= None,role=UserRole.USER) -> None:
+    def __init__(self, username: str, password: str, telephone_number= None,role=UserRoll.USER) -> None:
         """
         Initialize a User object.
 
