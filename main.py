@@ -1,4 +1,5 @@
 from users import User
+from cinema import Cinema
 import getpass
 import argparse
 
@@ -41,7 +42,14 @@ def main():
                     print(message_create_user)
                 
                 elif manager_choice == "2":
-                    pass
+                    film_name = input("Enter Film Name: \n")
+                    film_genre = input("Enter Film Genre: \n")
+                    film_play_time = input("Enter Film Playing Time In 00:00 Format: \n")
+                    film_age_category = input("Enter Age Category Of The Film: \n")
+                    capacity = input("Enter The Cinema Capacity: \n")
+                    message_create_sans = Cinema.create_sans(film_name,film_genre,film_play_time,film_age_category,capacity)
+                    print(message_create_sans)
+                    
             else:
                 print("You Have No Permissions")
                 
