@@ -14,9 +14,9 @@ def main():
         User.get_manager_details()
         
     while True:
-        print("Menu:")
+        print("<------Menu------>")
         print("0: Exit program")
-        print("1: Admin Panel")
+        print("1: Manager Panel")
         print("2: User Panel")
         choice = input("\nEnter your choice: ")
         
@@ -24,23 +24,26 @@ def main():
             break
         
         elif choice == "1":
-            print("0: Exit program")
-            print("1: Add Admin")
-            print("2: cinema screenings")
-            manager_choice = input("\nEnter your choice: ")
-            
-            if manager_choice == "0":
-                break
-            
-            elif manager_choice == "1":
-                username = input("Enter a username for admin: \n")
-                password = getpass.getpass("Enter a password (at least 4 characters): \n")
-                message_create_user = User.create_admin(username, password)
-                print(message_create_user)
-            
-            elif manager_choice == "2":
-                pass
-            
+            if args.manager:
+                print("<------Manager Panel------>")
+                print("0: Exit program")
+                print("1: Add Admin")
+                print("2: cinema screenings")
+                manager_choice = input("\nEnter your choice: ")
+                
+                if manager_choice == "0":
+                    break
+                
+                elif manager_choice == "1":
+                    username = input("Enter a username for admin: \n")
+                    password = getpass.getpass("Enter a password (at least 4 characters): \n")
+                    message_create_user = User.create_admin(username, password)
+                    print(message_create_user)
+                
+                elif manager_choice == "2":
+                    pass
+            else:
+                print("You Have No Permissions")
                 
         elif choice == "2":
             print("Menu:")
