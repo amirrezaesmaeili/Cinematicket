@@ -4,7 +4,7 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description="User Login")
-    parser.add_argument("--manager", action="store_true", help="Create an admin user")
+    parser.add_argument("-m","--manager", action="store_true", help="Create an admin user")
     parser.add_argument('-u',"--username", type=str, help="Username")
     parser.add_argument('-p',"--password", type=str, help="Password")
     args = parser.parse_args()
@@ -35,7 +35,8 @@ def main():
             elif manager_choice == "1":
                 username = input("Enter a username for admin: \n")
                 password = getpass.getpass("Enter a password (at least 4 characters): \n")
-                
+                message_create_user = User.create_admin(username, password)
+                print(message_create_user)
             
             elif manager_choice == "2":
                 pass

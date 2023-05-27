@@ -71,7 +71,7 @@ class User:
             return str(Err)
         
     @classmethod
-    def create_admin(cls, username: str, password: str, telephone_number: str = None,role=UserRole.ADMIN) -> str:
+    def create_admin(cls, username: str, password: str,role=UserRole.ADMIN) -> str:
         """
         Create a new user and save it to the database.
 
@@ -90,7 +90,7 @@ class User:
                 raise ValueError(validate)
             else:
                 password = cls.build_pass(password)
-                user = cls(username, password, telephone_number,role=UserRole.ADMIN)
+                user = cls(username, password,role=UserRole.ADMIN)
                 user.save_to_database()
                 return "\n>>>> Welcome : Admin created successfully. <<<<\n"
         except ValueError as Err:
