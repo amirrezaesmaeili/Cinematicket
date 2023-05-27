@@ -12,7 +12,7 @@ class TestUser(TestCase):
         self.password_admin = "password"
         self.username_manager = "manager"
         self.password_manager = "password"
-        
+ 
     def test_create_user(self):
         expected_output = "\n>>>> Welcome : User created successfully. <<<<\n"
         actual_output = User.create_user(self.username_user, self.password_user)
@@ -85,6 +85,7 @@ class TestUser(TestCase):
         with patch('builtins.print') as mock_print:
             User.get_manager_details()
             mock_print.assert_called_with(expected_output)
-             
+       
+
 if __name__ == "__main__":
     main()

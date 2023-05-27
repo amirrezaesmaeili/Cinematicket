@@ -146,16 +146,19 @@ class User:
             message: the username was updated successfully.
         """
         try:
-            if new_username in User.users:
-                raise ValueError("This username already exists.")
+            if self.username in User.users:
+                if new_username in User.users:
+                    raise ValueError("This username already exists.")
+                else:
+                    User.users.pop(self.username)
+                    self.username = new_username
+                    User.users[new_username] = self
+                    self.save_to_database()
+                    return "\n>>>> Username updated successfully. <<<<\n"
             else:
-                User.users.pop(self.username)
-                self.username = new_username
-                User.users[new_username] = self
-                self.save_to_database()
-                return "\n>>>> Username updated successfully. <<<<\n"
-        except ValueError as Err:
-            return str(Err)    
+                raise ValueError("The user does not exist.")
+        except ValueError as err:
+            return str(err)
 
     def update_telephone_number(self, new_telephone_number: str) -> str:
         """
