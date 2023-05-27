@@ -1,6 +1,6 @@
 from unittest import TestCase, main
-from unittest.mock import patch
-from users import User
+from unittest.mock import patch, Mock
+from users import User,UserRole
 from argparse import Namespace
 
 class TestUser(TestCase):
@@ -75,6 +75,16 @@ class TestUser(TestCase):
         with patch('builtins.print') as mock_print:
             User.create_manager_from_args(args)
             mock_print.assert_called_with(expected_output)
-            
+    
+    def test_get_manager_details(self):
+        manager_username = 'ali'
+        expected_output = f"Manager Username: {manager_username}\n"
+        
+        User.users = {manager_username: {"role": UserRole.MANAGER.value}}
+        
+        with patch('builtins.print') as mock_print:
+            User.get_manager_details()
+            mock_print.assert_called_with(expected_output)
+             
 if __name__ == "__main__":
     main()
