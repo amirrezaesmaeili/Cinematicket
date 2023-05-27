@@ -27,6 +27,14 @@ def main():
             print("0: Exit program")
             print("1: Add Admin")
             print("2: cinema screenings")
+            manager_choice = input("\nEnter your choice: ")
+            
+            if manager_choice == "0":
+                break
+            elif manager_choice == "1":
+                pass
+            elif manager_choice == "2":
+                pass
             
                 
         elif choice == "2":
