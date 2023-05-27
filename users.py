@@ -3,14 +3,14 @@ import hashlib
 import json
 from enum import Enum
 
-class UserRoll(Enum):
+class UserRole(Enum):
     ADMIN = "admin"
     USER = "user"
 
 class User:
     users = {}
 
-    def __init__(self, username: str, password: str, telephone_number= None,role=UserRoll.USER) -> None:
+    def __init__(self, username: str, password: str, telephone_number= None,role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -29,7 +29,7 @@ class User:
         """
         Return a string representation of the User object.
         """
-        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number or 'None'}"
+        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}\nUser Role{self.role}"
 
     @staticmethod
     def build_pass(password: str) -> str:
@@ -208,12 +208,6 @@ class User:
         except FileNotFoundError:
             User.users = {}
             
-
-    
-
-
-
-
     @staticmethod
     def validate_password(password: str) -> str:
         """
