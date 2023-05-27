@@ -4,14 +4,14 @@ import argparse
 
 def main():
     parser = argparse.ArgumentParser(description="User Login")
-    parser.add_argument("--admin", action="store_true", help="Create an admin user")
+    parser.add_argument("--manager", action="store_true", help="Create an admin user")
     parser.add_argument('-u',"--username", type=str, help="Username")
     parser.add_argument('-p',"--password", type=str, help="Password")
     args = parser.parse_args()
 
-    if args.admin:
-        User.create_admin_from_args(args)
-        User.get_admin_details()
+    if args.manager:
+        User.create_manager_from_args(args)
+        User.get_manager_details()
         
     while True:
         print("Menu:")
@@ -24,7 +24,10 @@ def main():
             break
         
         elif choice == "1":
-            pass
+            print("0: Exit program")
+            print("1: Add Admin")
+            print("2: cinema screenings")
+            
                 
         elif choice == "2":
             print("Menu:")
