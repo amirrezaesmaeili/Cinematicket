@@ -1,16 +1,17 @@
 import uuid
 import hashlib
 import json
+import argparse
 from enum import Enum
 
-class UserRoll(Enum):
+class UserRole(Enum):
     ADMIN = "admin"
     USER = "user"
 
 class User:
     users = {}
 
-    def __init__(self, username: str, password: str, telephone_number= None,role=UserRoll.USER) -> None:
+    def __init__(self, username: str, password: str, telephone_number= None,role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -29,7 +30,7 @@ class User:
         """
         Return a string representation of the User object.
         """
-        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number or 'None'}"
+        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}\nUser Role{self.role}"
 
     @staticmethod
     def build_pass(password: str) -> str:
@@ -62,14 +63,14 @@ class User:
                 raise ValueError(validate)
             else:
                 password = cls.build_pass(password)
-                user = cls(username, password, telephone_number,role =UserRole.USER)
+                user = cls(username, password, telephone_number,role=UserRole.USER)
                 user.save_to_database()
                 return "\n>>>> Welcome : User created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
         
     @classmethod
-    def create_admin(cls, username: str, password: str, telephone_number: str = None) -> str:
+    def create_admin(cls, username: str, password: str,role=UserRole.ADMIN) -> str:
         try:
             cls.load_from_database()
             validate = cls.validate_password(password)
@@ -83,11 +84,33 @@ class User:
                 if UserRole.ADMIN.value in [user['role'] for user in cls.users.values()]:
                     raise ValueError("An admin user already exists.")
                 else:
-                    user = cls(username, password, telephone_number, role=UserRole.ADMIN)
+                    user = cls(username, password, role=UserRole.ADMIN)
                     user.save_to_database()
                     return "\n>>>> Welcome: Admin user created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
+    
+    @classmethod
+    def create_admin_from_args(cls, args):
+        username = args.username
+        password = args.password
+
+        message_create_user = cls.create_admin(username, password, UserRole.ADMIN)
+        print(message_create_user)
+
+    @classmethod
+    def get_admin_details(cls):
+        admin_username = None
+        for username, user_info in cls.users.items():
+            if user_info["role"] == UserRole.ADMIN.value:
+                admin_username = username
+                break
+
+        if admin_username is not None:
+            print("<---------Admin Details--------->")
+            print(f"Username: {admin_username}\n")
+        else:
+            print("No admin user found.")
     
     
     def update_username(self, new_username: str) -> str:
@@ -204,10 +227,10 @@ class User:
         try:
             with open("database.json", "r", encoding="utf_8") as file:
                 User.users = json.load(file)
+       
         except FileNotFoundError:
             User.users = {}
-
-
+            
     @staticmethod
     def validate_password(password: str) -> str:
         """
