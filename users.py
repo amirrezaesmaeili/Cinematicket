@@ -1,7 +1,6 @@
 import uuid
 import hashlib
 import json
-import argparse
 from enum import Enum
 
 class UserRole(Enum):
