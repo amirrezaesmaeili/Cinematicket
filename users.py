@@ -203,9 +203,21 @@ class User:
         """
         try:
             with open("database.json", "r", encoding="utf_8") as file:
-                User.users = json.load(file)
+                User.users = json.load(file, object_hook=cls.user_from_dict)
+       
         except FileNotFoundError:
             User.users = {}
+            
+
+    @staticmethod
+    def user_from_dict(user_dict):
+        username = user_dict['username']
+        password = user_dict['password']
+        telephone_number = user_dict['telephone_number']
+        role = UserRoll(user_dict['role']) 
+        return User(username, password, telephone_number, role)
+
+
 
 
     @staticmethod
