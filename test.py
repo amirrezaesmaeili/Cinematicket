@@ -1,5 +1,5 @@
 from unittest import TestCase, main
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 from users import User,UserRole
 from argparse import Namespace
 
