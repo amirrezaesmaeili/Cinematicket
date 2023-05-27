@@ -1,6 +1,8 @@
 from unittest import TestCase, main
-from users import User, UserRole
-import uuid
+from unittest.mock import patch
+from users import User
+from argparse import Namespace
+
 class TestUser(TestCase):
     def setUp(self):
         self.username_user = "user"
@@ -66,5 +68,13 @@ class TestUser(TestCase):
         actual_output = User.create_manager(self.username_manager, self.password_manager)
         self.assertEqual(actual_output, expected_output)
 
+    def test_create_manager_from_args(self):
+        args = Namespace(username="mng", password="password")
+        expected_output = "\n>>>> Welcome: Manager created successfully. <<<<\n"
+        
+        with patch('builtins.print') as mock_print:
+            User.create_manager_from_args(args)
+            mock_print.assert_called_with(expected_output)
+            
 if __name__ == "__main__":
     main()
