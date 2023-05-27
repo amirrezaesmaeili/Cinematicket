@@ -24,5 +24,12 @@ class Cinema:
             }
             Cinema.sans[self.film_name] = sans_data
             json.dump(Cinema.sans,file,indent=4)
-    
-    
+            
+    @classmethod
+    def load_sans_from_file(cls):
+        try:
+            with open("Cinema_sans.json","r",encoding="utf_8") as file:
+                Cinema.sans = json.load(file)
+                
+        except FileNotFoundError:
+            Cinema.sans = {}   
