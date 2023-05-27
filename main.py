@@ -16,8 +16,8 @@ def main():
     while True:
         print("Menu:")
         print("0: Exit program")
-        print("1: Admin Login")
-        print("2: User Login")
+        print("1: Admin Panel")
+        print("2: User Panel")
         choice = input("\nEnter your choice: ")
         
         if choice == "0":
