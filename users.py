@@ -107,12 +107,9 @@ class User:
                 raise ValueError(validate)
             else:
                 password = cls.build_pass(password)
-                if UserRole.MANAGER.value in [user['role'] for user in cls.users.values()]:
-                    raise ValueError("Manager user already exists.")
-                else:
-                    user = cls(username, password, role=UserRole.MANAGER)
-                    user.save_to_database()
-                    return "\n>>>> Welcome: Manager created successfully. <<<<\n"
+                user = cls(username, password, role=UserRole.MANAGER)
+                user.save_to_database()
+                return "\n>>>> Welcome: Manager created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
     
