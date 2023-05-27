@@ -108,7 +108,7 @@ class User:
             else:
                 password = cls.build_pass(password)
                 if UserRole.MANAGER.value in [user['role'] for user in cls.users.values()]:
-                    raise ValueError("An admin user already exists.")
+                    raise ValueError("Manager user already exists.")
                 else:
                     user = cls(username, password, role=UserRole.MANAGER)
                     user.save_to_database()
