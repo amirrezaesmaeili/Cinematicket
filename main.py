@@ -31,8 +31,12 @@ def main():
             
             if manager_choice == "0":
                 break
+            
             elif manager_choice == "1":
-                pass
+                username = input("Enter a username for admin: \n")
+                password = getpass.getpass("Enter a password (at least 4 characters): \n")
+                
+            
             elif manager_choice == "2":
                 pass
             
