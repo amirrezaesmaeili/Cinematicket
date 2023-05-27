@@ -1,10 +1,11 @@
 from users import User
+from cinema import Cinema
 import getpass
 import argparse
 
 def main():
     parser = argparse.ArgumentParser(description="User Login")
-    parser.add_argument("--manager", action="store_true", help="Create an admin user")
+    parser.add_argument("-m","--manager", action="store_true", help="Create an admin user")
     parser.add_argument('-u',"--username", type=str, help="Username")
     parser.add_argument('-p',"--password", type=str, help="Password")
     args = parser.parse_args()
@@ -14,9 +15,9 @@ def main():
         User.get_manager_details()
         
     while True:
-        print("Menu:")
+        print("<------Menu------>")
         print("0: Exit program")
-        print("1: Admin Panel")
+        print("1: Manager Panel")
         print("2: User Panel")
         choice = input("\nEnter your choice: ")
         
@@ -24,10 +25,33 @@ def main():
             break
         
         elif choice == "1":
-            print("0: Exit program")
-            print("1: Add Admin")
-            print("2: cinema screenings")
-            
+            if args.manager:
+                print("<------Manager Panel------>")
+                print("0: Exit program")
+                print("1: Add Admin")
+                print("2: cinema screenings")
+                manager_choice = input("\nEnter your choice: ")
+                
+                if manager_choice == "0":
+                    break
+                
+                elif manager_choice == "1":
+                    username = input("Enter a username for admin: \n")
+                    password = getpass.getpass("Enter a password (at least 4 characters): \n")
+                    message_create_user = User.create_admin(username, password)
+                    print(message_create_user)
+                
+                elif manager_choice == "2":
+                    film_name = input("Enter Film Name: \n")
+                    film_genre = input("Enter Film Genre: \n")
+                    film_play_time = input("Enter Film Playing Time In 00:00 Format: \n")
+                    film_age_category = input("Enter Age Category Of The Film: \n")
+                    capacity = input("Enter The Cinema Capacity: \n")
+                    message_create_sans = Cinema.create_sans(film_name,film_genre,film_play_time,film_age_category,capacity)
+                    print(message_create_sans)
+                    
+            else:
+                print("You Have No Permissions")
                 
         elif choice == "2":
             print("Menu:")

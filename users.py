@@ -71,6 +71,32 @@ class User:
             return str(Err)
         
     @classmethod
+    def create_admin(cls, username: str, password: str,role=UserRole.ADMIN) -> str:
+        """
+        Create a new user and save it to the database.
+
+        Args:
+            username: The username for the new user.
+            password: The password for the new user.
+            telephone_number: The telephone number for the new user. Defaults to None.
+        """
+        try:
+            cls.load_from_database()
+            validate = cls.validate_password(password)
+
+            if username in cls.users:
+                raise ValueError("This username already exists.")
+            elif validate is not None:
+                raise ValueError(validate)
+            else:
+                password = cls.build_pass(password)
+                user = cls(username, password,role=UserRole.ADMIN)
+                user.save_to_database()
+                return "\n>>>> Welcome : Admin created successfully. <<<<\n"
+        except ValueError as Err:
+            return str(Err)
+        
+    @classmethod
     def create_manager(cls, username: str, password: str,role=UserRole.MANAGER) -> str:
         try:
             cls.load_from_database()
@@ -87,7 +113,7 @@ class User:
                 else:
                     user = cls(username, password, role=UserRole.MANAGER)
                     user.save_to_database()
-                    return "\n>>>> Welcome: Admin user created successfully. <<<<\n"
+                    return "\n>>>> Welcome: Manager created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
     
@@ -112,8 +138,7 @@ class User:
             print(f"Manager Username: {manager_username}\n")
         else:
             print("No manager user found.")
-    
-    
+
     def update_username(self, new_username: str) -> str:
         """
         Update the username for the user.
