@@ -139,9 +139,6 @@ class User:
         else:
             print("No manager user found.")
 
-    
-    
-    
     def update_username(self, new_username: str) -> str:
         """
         Update the username for the user.
