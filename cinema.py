@@ -3,7 +3,7 @@ import json
 class Cinema:
     id_counter = 0
     sans={}
-    def __init__(self,id : int,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int):
+    def __init__(self,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int):
         Cinema.id_counter += 1
         self.id = Cinema.id_counter
         self.film_name = film_name
@@ -12,6 +12,17 @@ class Cinema:
         self.film_age_category = film_age_category
         self.capacity = capacity
         
- 
+    def save_sans_to_file(self):
+        with open("Cinema_sans.json","w",encoding="utf_8") as file:
+            sans_data = {
+                "id" : self.id,
+                "film_name": self.film_name,
+                "film_genre": self.film_genre,
+                "film_play_time": self.film_paly_time,
+                "film_age_category": self.film_age_category,
+                "capacity": self.capacity
+            }
+            Cinema.sans[self.film_name] = sans_data
+            json.dump(Cinema.sans,file,indent=4)
     
     
