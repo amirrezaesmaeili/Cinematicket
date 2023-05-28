@@ -43,7 +43,5 @@ class Cinema:
         except ValueError as Err:
             return str(Err)
 
-    @staticmethod
-    def clear_screen():
-           os.system("clear")    
+  
                 

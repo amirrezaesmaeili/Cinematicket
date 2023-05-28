@@ -4,7 +4,7 @@ import getpass
 import argparse
 
 def main():
-    User.clear_screen()
+    User.clear_screen()          
     parser = argparse.ArgumentParser(description="User Login")
     parser.add_argument("-m","--manager", action="store_true", help="Create an admin user")
     parser.add_argument('-u',"--username", type=str, help="Username")
@@ -92,14 +92,13 @@ def main():
             
             elif user_choice == "2":
                 User.clear_screen()
-                username = input("Enter your username: ")
+                username = input("Enter your username: \n")
                 password = User.build_pass(getpass.getpass("Enter your password: \n"))
                 User.load_from_database()
                 if username in User.users and User.users[username]["password"] == password:
                     user = User(username, User.users[username]["password"], User.users[username]["telephone_number"])
                     
                     while True:
-                        User.clear_screen()
                         print("User menu:")
                         print("1: View user information")
                         print("2: Edit user information")
@@ -146,7 +145,8 @@ def main():
                             User.clear_screen()            
                             print("\n>>>> Invalid choice <<<<\n")
                             
-
+            
+    
             else:  
                 User.clear_screen()          
                 print("\n>>>> Invalid choice <<<<\n")
