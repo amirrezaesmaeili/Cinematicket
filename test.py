@@ -2,6 +2,7 @@ from unittest import TestCase, main
 from unittest.mock import patch
 from users import User,UserRole
 from argparse import Namespace
+import json
 
 class TestUser(TestCase):
     def setUp(self):
@@ -155,6 +156,32 @@ class TestUser(TestCase):
         self.assertEqual(user_data["telephone_number"], user.telephone_number)
         self.assertEqual(user_data["role"], user.role.value)
     
+    def test_load_from_database(self):
+        user_data = {
+            "testuser1": {
+                "id": "123",
+                "username": "testuser1",
+                "password": "password1",
+                "telephone_number": "1234567890",
+                "role": "user"
+            },
+            "testuser2": {
+                "id": "456",
+                "username": "testuser2",
+                "password": "password2",
+                "telephone_number": "9876543210",
+                "role": "admin"
+            }
+        }
+
+        with open("database.json", "w", encoding="utf_8") as file:
+            json.dump(user_data, file, indent=4)
+
+        User.users = {}
+
+        User.load_from_database()
+
+        self.assertEqual(User.users, user_data)
     
 if __name__ == "__main__":
     main()
