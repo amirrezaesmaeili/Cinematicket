@@ -1,4 +1,13 @@
 import json
+import logging
+
+
+logger = logging.getLogger("CinemaLogger")
+logger.setLevel(level=logging.INFO)
+file_handler = logging.FileHandler("cinematicket.log")
+pattern = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(pattern)
+logger.addHandler(file_handler)
 
 class Cinema:
     id_counter = 0
@@ -39,8 +48,10 @@ class Cinema:
         try:
                 cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity)
                 cinema_sans.save_sans_to_file()
-                return f"\n>>>>  Sans for {film_name} in {film_play_time} created successfully. <<<<\n"
+                logger.info(f"Sans created successfully.")
+                return f"\n>>>>  Sans created successfully. <<<<\n"
         except ValueError as Err:
+            logger.error(Err)
             return str(Err)
 
                 
