@@ -207,6 +207,7 @@ class User:
                 self._password = self.build_pass(new_password1)
                 self.save_to_database()
                 return "\n>>>> Password updated successfully. <<<<\n"
+           
         except ValueError as Err:
             return str(Err)
 

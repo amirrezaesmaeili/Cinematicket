@@ -14,7 +14,9 @@ class TestUser(TestCase):
         self.password_manager = "password"
         self.user_update = User("old_username", "password")
         User.create_user("old_username", "password")
-        self.user_phone = User("John", "password","1234")
+        self.user_change_phone = User("John", "password","1234")
+        # self.user_change_pass = User("Alex", "password123")
+        self.user_save_to_database = User("testuser", "password", "1234567890")
         
     
     def tearDown(self):
@@ -110,12 +112,49 @@ class TestUser(TestCase):
 
     def test_update_telephone_number(self):
         
-        user1 = self.user_phone
+        user1 = self.user_change_phone
     
         result1 = user1.update_telephone_number("1234567890")
 
         self.assertEqual(result1, "\n>>>> Telephone number updated successfully. <<<<\n")
         self.assertEqual(user1.telephone_number, "1234567890")
 
+    # def test_update_password(self):
+        
+    #     result1 = self.user_change_pass.update_password("password123", "newpassword123", "newpassword123")
+    #     self.assertEqual(result1, "\n>>>> Password updated successfully. <<<<\n")
+
+        
+    #     result2 = self.user_change_pass.update_password("wrongpassword", "newpassword123", "newpassword123")
+    #     self.assertEqual(result2, "Incorrect old password.")
+
+    #     result3 = self.user_change_pass.update_password("password123", "short", "short")
+    #     self.assertEqual(result3, "New password must be at least 4 characters long.")
+
+    #     result4 = self.user_change_pass.update_password("password123", "newpassword123", "mismatch")
+    #     self.assertEqual(result4, "New passwords do not match.")
+
+        
+    #     result5 = self.user_change_pass.update_password("password123", "password123", "password123")
+    #     self.assertEqual(result5, "New password must be different from the old password.")
+    
+    def test_save_to_database(self):
+        user = self.user_save_to_database
+
+        user.save_to_database()
+
+        User.load_from_database()
+
+        self.assertIn("testuser", User.users)
+
+        user_data = User.users["testuser"]
+
+        self.assertEqual(user_data["id"], user.id)
+        self.assertEqual(user_data["username"], user.username)
+        self.assertEqual(user_data["password"], user._password)
+        self.assertEqual(user_data["telephone_number"], user.telephone_number)
+        self.assertEqual(user_data["role"], user.role.value)
+    
+    
 if __name__ == "__main__":
     main()
