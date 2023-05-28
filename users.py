@@ -2,6 +2,7 @@ import uuid
 import hashlib
 import json
 from enum import Enum
+import os
 
 class UserRole(Enum):
     MANAGER = "manager"
@@ -264,5 +265,8 @@ class User:
         """
         if len(password) < 4:
             raise ValueError("New password must be at least 4 characters long.")
-        
+       
+    @staticmethod
+    def clear_screen():
+           os.system("clear")    
     
