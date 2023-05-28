@@ -12,8 +12,9 @@ class TestUser(TestCase):
         self.password_admin = "password"
         self.username_manager = "manager"
         self.password_manager = "password"
-        self.user = User("old_username", "password")
+        self.user_update = User("old_username", "password")
         User.create_user("old_username", "password")
+        self.user_phone = User("John", "password","1234")
         
     
     def tearDown(self):
@@ -95,17 +96,26 @@ class TestUser(TestCase):
     def test_update_username(self):
 
             new_username = "username"
-            result = self.user.update_username(new_username)
+            result = self.user_update.update_username(new_username)
             self.assertEqual(result, "\n>>>> Username updated successfully. <<<<\n")
             
             new_username = "username"
-            result = self.user.update_username(new_username)
+            result = self.user_update.update_username(new_username)
             self.assertEqual(result, "This username already exists.")
             
             User.users.clear()
             new_username = "new_username"
-            result = self.user.update_username(new_username)
+            result = self.user_update.update_username(new_username)
             self.assertEqual(result, "The user does not exist.") 
+
+    def test_update_telephone_number(self):
+        
+        user1 = self.user_phone
+    
+        result1 = user1.update_telephone_number("1234567890")
+
+        self.assertEqual(result1, "\n>>>> Telephone number updated successfully. <<<<\n")
+        self.assertEqual(user1.telephone_number, "1234567890")
 
 if __name__ == "__main__":
     main()

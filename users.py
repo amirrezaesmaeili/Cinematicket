@@ -30,7 +30,7 @@ class User:
         """
         Return a string representation of the User object.
         """
-        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}\nUser Role{self.role}"
+        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}"
 
     @staticmethod
     def build_pass(password: str) -> str:
@@ -171,9 +171,6 @@ class User:
             message: telephone number was updated successfully.
         """
         try:
-            if new_telephone_number in User.users:
-                raise ValueError("This telephone number already exists.")
-            else:
                 self.telephone_number = new_telephone_number
                 self.save_to_database()
                 return "\n>>>> Telephone number updated successfully. <<<<\n"
