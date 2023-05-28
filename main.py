@@ -22,6 +22,7 @@ def main():
         choice = input("\nEnter your choice: ")
         
         if choice == "0":
+            User.clear_screen()
             break
         
         elif choice == "1":
