@@ -17,7 +17,7 @@ def main():
         
         
     while True:
-        User.clear_screen()
+        # User.clear_screen()
         print("<------Menu------>")
         print("0: Exit program")
         print("1: Manager Panel")
