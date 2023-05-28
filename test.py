@@ -4,6 +4,7 @@ from users import User,UserRole
 from cinema import Cinema
 from argparse import Namespace
 import json
+import os
 
 class TestUser(TestCase):
     def setUp(self):
@@ -15,7 +16,7 @@ class TestUser(TestCase):
         self.username_manager = "manager"
         self.password_manager = "password"
         self.user_update = User("old_username", "password")
-        User.create_user("old_username", "password")
+      
         self.user_change_phone = User("John", "password","1234")
         # self.user_change_pass = User("Alex", "password123")
         self.user_save_to_database = User("testuser", "password", "1234567890")
@@ -42,6 +43,7 @@ class TestUser(TestCase):
         expected_output = "This username already exists."
         actual_output = User.create_user(self.username_user, self.password_user)
         self.assertEqual(actual_output, expected_output)
+        os.remove("database.json")
     
     def test_create_admin(self):
 
@@ -58,6 +60,7 @@ class TestUser(TestCase):
         expected_output = "New password must be at least 4 characters long."
         actual_output = User.create_admin(self.username_admin, self.password_admin)
         self.assertEqual(actual_output, expected_output)
+        os.remove("database.json")
 
     def test_create_manager(self):
 
@@ -78,6 +81,7 @@ class TestUser(TestCase):
         expected_output = "This username already exists."
         actual_output = User.create_manager(self.username_manager, self.password_manager)
         self.assertEqual(actual_output, expected_output)
+        os.remove("database.json")
 
     def test_create_manager_from_args(self):
         args = Namespace(username="mng", password="password")
@@ -86,6 +90,7 @@ class TestUser(TestCase):
         with patch('builtins.print') as mock_print:
             User.create_manager_from_args(args)
             mock_print.assert_called_with(expected_output)
+        os.remove("database.json")
     
     def test_get_manager_details(self):
         manager_username = 'ali'
@@ -96,9 +101,10 @@ class TestUser(TestCase):
         with patch('builtins.print') as mock_print:
             User.get_manager_details()
             mock_print.assert_called_with(expected_output)
+        
        
     def test_update_username(self):
-
+            User.create_user("old_username", "password")
             new_username = "username"
             result = self.user_update.update_username(new_username)
             self.assertEqual(result, "\n>>>> Username updated successfully. <<<<\n")
@@ -111,6 +117,7 @@ class TestUser(TestCase):
             new_username = "new_username"
             result = self.user_update.update_username(new_username)
             self.assertEqual(result, "The user does not exist.") 
+            os.remove("database.json")
 
     def test_update_telephone_number(self):
         
@@ -120,6 +127,7 @@ class TestUser(TestCase):
 
         self.assertEqual(result1, "\n>>>> Telephone number updated successfully. <<<<\n")
         self.assertEqual(user1.telephone_number, "1234567890")
+        os.remove("database.json")
 
     # def test_update_password(self):
         
@@ -156,6 +164,7 @@ class TestUser(TestCase):
         self.assertEqual(user_data["password"], user._password)
         self.assertEqual(user_data["telephone_number"], user.telephone_number)
         self.assertEqual(user_data["role"], user.role.value)
+        os.remove("database.json")
     
     def test_load_from_database(self):
         user_data = {
@@ -183,6 +192,7 @@ class TestUser(TestCase):
         User.load_from_database()
 
         self.assertEqual(User.users, user_data)
+        os.remove("database.json")
     
     def test_validate_password(self):
         try:
@@ -209,7 +219,70 @@ class TestCinema(TestCase):
         result = Cinema.create_sans("Film1", "Genre1", "10:00", 18, 100)
         expected = "\n>>>>  Sans created successfully. <<<<\n"
         self.assertEqual(result, expected)
+        os.remove("Cinema_sans.json")
         
+    def test_save_sans_to_file(self):
+
+        cinema = Cinema("Film1", "Genre1", "10:00", 18, 100)
+
+
+        cinema.save_sans_to_file()
+
+
+        self.assertTrue(os.path.exists("Cinema_sans.json"))
+
+
+        with open("Cinema_sans.json", "r", encoding="utf_8") as file:
+            data = json.load(file)
+
+
+        self.assertIn("Film1", data)
+
+        self.assertEqual(data["Film1"]["film_name"], "Film1")
+        self.assertEqual(data["Film1"]["film_genre"], "Genre1")
+        self.assertEqual(data["Film1"]["film_play_time"], "10:00")
+        self.assertEqual(data["Film1"]["film_age_category"], 18)
+        self.assertEqual(data["Film1"]["capacity"], 100)    
     
+        os.remove("Cinema_sans.json")
+    
+    def test_load_sans_from_file(self):
+        data = {
+            "Film1": {
+                "id": 1,
+                "film_name": "Film1",
+                "film_genre": "Genre1",
+                "film_play_time": "10:00",
+                "film_age_category": 18,
+                "capacity": 100
+            },
+            "Film2": {
+                "id": 2,
+                "film_name": "Film2",
+                "film_genre": "Genre2",
+                "film_play_time": "12:00",
+                "film_age_category": 12,
+                "capacity": 80
+            }
+        }
+        with open("Cinema_sans.json", "w", encoding="utf_8") as file:
+            json.dump(data, file, indent=4)
+
+        Cinema.load_sans_from_file()
+
+        self.assertEqual(Cinema.sans["Film1"]["film_name"], "Film1")
+        self.assertEqual(Cinema.sans["Film1"]["film_genre"], "Genre1")
+        self.assertEqual(Cinema.sans["Film1"]["film_play_time"], "10:00")
+        self.assertEqual(Cinema.sans["Film1"]["film_age_category"], 18)
+        self.assertEqual(Cinema.sans["Film1"]["capacity"], 100)
+
+        self.assertEqual(Cinema.sans["Film2"]["film_name"], "Film2")
+        self.assertEqual(Cinema.sans["Film2"]["film_genre"], "Genre2")
+        self.assertEqual(Cinema.sans["Film2"]["film_play_time"], "12:00")
+        self.assertEqual(Cinema.sans["Film2"]["film_age_category"], 12)
+        self.assertEqual(Cinema.sans["Film2"]["capacity"], 80)
+
+        os.remove("Cinema_sans.json")
+        
 if __name__ == "__main__":
     main()
