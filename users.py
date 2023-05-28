@@ -3,6 +3,7 @@ import hashlib
 import json
 from enum import Enum
 import os
+import platform
 
 class UserRole(Enum):
     MANAGER = "manager"
@@ -268,5 +269,7 @@ class User:
        
     @staticmethod
     def clear_screen():
-           os.system("clear")    
-    
+        if platform.system() == "Windows":
+            os.system("cls")    
+        else:
+            os.system("clear")        
