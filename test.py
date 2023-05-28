@@ -12,7 +12,13 @@ class TestUser(TestCase):
         self.password_admin = "password"
         self.username_manager = "manager"
         self.password_manager = "password"
- 
+        self.user = User("old_username", "password")
+        User.create_user("old_username", "password")
+        
+    
+    def tearDown(self):
+        User.users.clear()
+        
     def test_create_user(self):
         expected_output = "\n>>>> Welcome : User created successfully. <<<<\n"
         actual_output = User.create_user(self.username_user, self.password_user)
@@ -86,6 +92,20 @@ class TestUser(TestCase):
             User.get_manager_details()
             mock_print.assert_called_with(expected_output)
        
+    def test_update_username(self):
+
+            new_username = "username"
+            result = self.user.update_username(new_username)
+            self.assertEqual(result, "\n>>>> Username updated successfully. <<<<\n")
+            
+            new_username = "username"
+            result = self.user.update_username(new_username)
+            self.assertEqual(result, "This username already exists.")
+            
+            User.users.clear()
+            new_username = "new_username"
+            result = self.user.update_username(new_username)
+            self.assertEqual(result, "The user does not exist.") 
 
 if __name__ == "__main__":
     main()
