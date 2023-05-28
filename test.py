@@ -183,5 +183,24 @@ class TestUser(TestCase):
 
         self.assertEqual(User.users, user_data)
     
+    def test_validate_password(self):
+        try:
+            User.validate_password("pass")
+        except ValueError:
+            self.fail("Valid password raised ValueError")
+
+        with self.assertRaises(ValueError):
+            User.validate_password("pa")
+
+        try:
+            User.validate_password("pass")
+        except ValueError:
+            self.fail("Valid password raised ValueError")
+
+        try:
+            User.validate_password("password")
+        except ValueError:
+            self.fail("Valid password raised ValueError")
+    
 if __name__ == "__main__":
     main()
