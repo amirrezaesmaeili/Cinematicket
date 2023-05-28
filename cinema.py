@@ -37,14 +37,11 @@ class Cinema:
     @classmethod
     def create_sans(cls,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int):
         try:
-            cls.load_sans_from_file()
-            if film_name in cls.sans:
-                raise ValueError("This Film already exists.")
-            else:
-                cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity)
-                cinema_sans.save_sans_to_file()
-                return f"\n>>>>  Sans for {film_name} in {film_play_time} created successfully. <<<<\n"
+            cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity)
+            cinema_sans.save_sans_to_file()
+            return "\n>>>>  Sans created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
 
+           
                 

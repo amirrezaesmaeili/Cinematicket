@@ -1,6 +1,7 @@
 from unittest import TestCase, main
 from unittest.mock import patch
 from users import User,UserRole
+from cinema import Cinema
 from argparse import Namespace
 import json
 
@@ -201,6 +202,14 @@ class TestUser(TestCase):
             User.validate_password("password")
         except ValueError:
             self.fail("Valid password raised ValueError")
+
+class TestCinema(TestCase):
+    
+    def test_create_sans(self):
+        result = Cinema.create_sans("Film1", "Genre1", "10:00", 18, 100)
+        expected = "\n>>>>  Sans created successfully. <<<<\n"
+        self.assertEqual(result, expected)
+        
     
 if __name__ == "__main__":
     main()
