@@ -16,7 +16,6 @@ class TestUser(TestCase):
         self.username_manager = "manager"
         self.password_manager = "password"
         self.user_update = User("old_username", "password")
-      
         self.user_change_phone = User("John", "password","1234")
         # self.user_change_pass = User("Alex", "password123")
         self.user_save_to_database = User("testuser", "password", "1234567890")
