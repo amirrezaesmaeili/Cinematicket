@@ -66,6 +66,17 @@ class User:
         final_price = original_price - discount_amount
         return final_price
 
+class UserEncoder(json.JSONEncoder):
+    def default(self, o):
+        """
+        Convert User and datetime.date objects to JSON serializable format.
+        """
+        if isinstance(o, User):
+            return o.__dict__
+        if isinstance(o, datetime.date):
+            return o.isoformat()
+        return super().default(o)
+
     
 
 
