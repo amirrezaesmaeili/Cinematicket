@@ -15,7 +15,7 @@ class User:
         self.birthdate = birthdate
         self.membership_months = membership_months
         self.age_rating = age_rating
-        
+
 
     def is_birthday(self) -> bool:
         """
@@ -23,4 +23,11 @@ class User:
         """
         today = datetime.date.today()
         return today.month == self.birthdate.month and today.day == self.birthdate.day
+    
+    def can_get_discount(self) -> bool:
+        """
+        Check if the user is eligible for a discount.
+        """
+        return self.is_birthday() or self.membership_months > 0
+
 
