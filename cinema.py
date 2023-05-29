@@ -1,5 +1,5 @@
 import json
-import os
+
 class Cinema:
     id_counter = 0
     sans={}
