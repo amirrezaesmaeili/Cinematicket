@@ -89,6 +89,16 @@ users = [user1, user2, user3,user4]
 os.system('cls')
 
 
+# Check discount for each user
+for user in users:
+    if user.can_get_discount():
+        original_price = 100
+        final_price = user.discount_apply(original_price)
+        print(f"User {user.name} is eligible for a discount. Final price: {final_price}")
+    else:
+        print(f"User {user.name} is not eligible for a discount.")
+
+
 
     
 
