@@ -121,6 +121,13 @@ for user in users:
 with open("users.pickle", "wb") as file:
     pickle.dump(users, file)
 
+# Save user information to a JSON file
+users_json = json.dumps(users, cls=UserEncoder)
+with open("users.json", "w") as file:
+    file.write(users_json)
+
+
+
 
 
 
