@@ -4,6 +4,14 @@ import json
 from enum import Enum
 import os
 import platform
+import logging
+
+logger = logging.getLogger("UserLogger")
+logger.setLevel(level=logging.INFO)
+file_handler = logging.FileHandler("cinematicket.log")
+pattern = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(pattern)
+logger.addHandler(file_handler)
 
 class UserRole(Enum):
     MANAGER = "manager"
@@ -60,6 +68,7 @@ class User:
             validate = cls.validate_password(password)
 
             if username in cls.users:
+                logger.error("This username already exists.")
                 raise ValueError("This username already exists.")
             elif validate is not None:
                 raise ValueError(validate)
@@ -67,6 +76,7 @@ class User:
                 password = cls.build_pass(password)
                 user = cls(username, password, telephone_number,role=UserRole.USER)
                 user.save_to_database()
+                logger.info("Welcome : User created successfully.")
                 return "\n>>>> Welcome : User created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
@@ -86,6 +96,7 @@ class User:
             validate = cls.validate_password(password)
 
             if username in cls.users:
+                logger.error("This username already exists.")
                 raise ValueError("This username already exists.")
             elif validate is not None:
                 raise ValueError(validate)
@@ -93,6 +104,7 @@ class User:
                 password = cls.build_pass(password)
                 user = cls(username, password,role=UserRole.ADMIN)
                 user.save_to_database()
+                logger.info("Welcome : Admin created successfully.")
                 return "\n>>>> Welcome : Admin created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
@@ -104,6 +116,7 @@ class User:
             validate = cls.validate_password(password)
 
             if username in cls.users:
+                logger.error("This username already exists.")
                 raise ValueError("This username already exists.")
             elif validate is not None:
                 raise ValueError(validate)
@@ -111,6 +124,7 @@ class User:
                 password = cls.build_pass(password)
                 user = cls(username, password, role=UserRole.MANAGER)
                 user.save_to_database()
+                logger.info("Welcome : Manager created successfully.")
                 return "\n>>>> Welcome: Manager created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
@@ -132,9 +146,12 @@ class User:
                 break
 
         if manager_username is not None:
+            logger.info("<---------Manager Details--------->")
+            logger.info(f"Manager Username: {manager_username}")
             print("<---------Manager Details--------->")
             print(f"Manager Username: {manager_username}\n")
         else:
+            logger.warning("No manager user found.")
             print("No manager user found.")
 
     def update_username(self, new_username: str) -> str:
@@ -150,14 +167,17 @@ class User:
         try:
             if self.username in User.users:
                 if new_username in User.users:
+                    logger.error("This username already exists.")
                     raise ValueError("This username already exists.")
                 else:
                     User.users.pop(self.username)
                     self.username = new_username
                     User.users[new_username] = self
                     self.save_to_database()
+                    logger.info("Username updated successfully.")
                     return "\n>>>> Username updated successfully. <<<<\n"
             else:
+                logger.error("The user does not exist.")
                 raise ValueError("The user does not exist.")
         except ValueError as err:
             return str(err)
@@ -175,6 +195,7 @@ class User:
         try:
                 self.telephone_number = new_telephone_number
                 self.save_to_database()
+                logger.info("Telephone number updated successfully.")
                 return "\n>>>> Telephone number updated successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
@@ -196,21 +217,28 @@ class User:
             old_password = self.build_pass(old_password)
 
             if old_password != self._password:
+                logger.error("Incorrect old password.")
                 raise ValueError("Incorrect old password.")
             elif new_pass is not None:
+                logger.error(ValueError)
                 raise ValueError(new_pass)
             elif new_password1 != new_password2:
+                logger.error("New passwords do not match.")
                 raise ValueError("New passwords do not match.")
             elif len(new_password1) < 4:
+                logger.error("New password must be at least 4 characters long.")
                 raise ValueError("New password must be at least 4 characters long.")
             elif self.build_pass(new_password1) == old_password:
+                logger.error("New password must be different from the old password.")
                 raise ValueError("New password must be different from the old password.")
             else:
                 self._password = self.build_pass(new_password1)
                 self.save_to_database()
+                logger.info("Password updated successfully.")
                 return "\n>>>> Password updated successfully. <<<<\n"
            
         except ValueError as Err:
+            logger.error(Err)
             return str(Err)
 
     @staticmethod
@@ -226,6 +254,7 @@ class User:
             message: new passwords match or not
         """
         if pass1 != pass2:
+            logger.error("New passwords do not match.")
             raise ValueError("New passwords do not match.")
         return None
 
@@ -265,6 +294,7 @@ class User:
             password: The password to be validated.
         """
         if len(password) < 4:
+            logger.error("New password must be at least 4 characters long.")
             raise ValueError("New password must be at least 4 characters long.")
        
     @staticmethod
