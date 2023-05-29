@@ -282,6 +282,23 @@ class TestCinema(TestCase):
         self.assertEqual(Cinema.sans["Film2"]["capacity"], 80)
 
         os.remove("Cinema_sans.json")
+       
+    def test_get_all_sans(self):
+        film_name = "Film Name"
+        film_genre = "Film Genre"
+        film_play_time = "12:00"
+        film_age_category = 18
+        capacity = 100
+
+        with patch('cinema.Cinema.load_sans_from_file') as mock_load_sans:
+            mock_load_sans.return_value = None
+
+            sans_list = Cinema.get_all_sans()
+
+            mock_load_sans.assert_called_once()
+
+
+        self.assertEqual(sans_list, list(Cinema.sans.values()))
         
 if __name__ == "__main__":
     main()
