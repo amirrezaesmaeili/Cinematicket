@@ -29,5 +29,17 @@ class User:
         Check if the user is eligible for a discount.
         """
         return self.is_birthday() or self.membership_months > 0
+    
+
+    def can_reserve_session(self, session_time: datetime.datetime, theater_capacity: int = None) -> bool:
+        """
+        Check if the user can reserve a session.
+        """
+        if session_time < datetime.datetime.now():
+            raise MyException("Session time has passed.")
+        if theater_capacity is not None and theater_capacity <= 0:
+            raise MyException("Theater capacity is full.")
+        return True
+
 
 
