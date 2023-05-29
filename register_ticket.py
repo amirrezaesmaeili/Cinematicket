@@ -98,6 +98,17 @@ for user in users:
     else:
         print(f"User {user.name} is not eligible for a discount.")
 
+# Check session reservation for each user
+session_time = datetime.datetime(2023, 5, 29, 22, 30)
+theater_capacity = 100
+for user in users:
+    try:
+        user.can_reserve_session(session_time, theater_capacity)
+        print(f"User {user.name} can reserve the session.")
+    except MyException as e:
+        print(f"Error: {str(e)}")
+
+
 
 
     
