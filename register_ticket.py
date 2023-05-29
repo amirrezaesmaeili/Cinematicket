@@ -42,4 +42,11 @@ class User:
         return True
 
 
+    def can_watch_movie(self, movie_age_rating: int) -> bool:
+        """
+        Check if the user can watch a movie based on its age rating.
+        """
+        return self.age_rating >= movie_age_rating
+
+
 
