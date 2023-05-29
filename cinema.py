@@ -43,5 +43,7 @@ class Cinema:
         except ValueError as Err:
             return str(Err)
 
-  
-                
+    @classmethod
+    def get_all_sans(cls):
+        cls.load_sans_from_file()
+        return list(cls.sans.values())            

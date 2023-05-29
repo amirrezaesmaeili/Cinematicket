@@ -103,7 +103,8 @@ def main():
                         print("1: View user information")
                         print("2: Edit user information")
                         print("3: Change password")
-                        print("4: Logout")
+                        print("4: cinema screenings")
+                        print("5: Logout")
                         user_login_choice = input("Enter your choice: ")
                         
                         if  user_login_choice == "1":
@@ -138,7 +139,16 @@ def main():
                             print(message_update_password)
 
                         elif user_login_choice == "4":
-                            User.clear_screen()
+                            sans_list = Cinema.get_all_sans()
+                            for sans in sans_list:
+                                print(f"Film Name: {sans['film_name']}")
+                                print(f"Film Genre: {sans['film_genre']}")
+                                print(f"Film Playing Time: {sans['film_play_time']}")
+                                print(f"Age Category: {sans['film_age_category']}")
+                                print(f"Capacity: {sans['capacity']}")
+                                print("---------------------------")
+                                            
+                        elif user_login_choice == "5":
                             break
                         
                         else:
