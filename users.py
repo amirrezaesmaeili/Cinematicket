@@ -33,7 +33,6 @@ class User:
         self.username = username
         self._password = password
         self.telephone_number = telephone_number
-        self.id = str(uuid.uuid4())
         self.role = role
 
     def __str__(self) -> str:
@@ -74,6 +73,7 @@ class User:
                 raise ValueError(validate)
             else:
                 password = cls.build_pass(password)
+                self.id = str(uuid.uuid4())
                 user = cls(username, password, telephone_number,role=UserRole.USER)
                 user.save_to_database()
                 logger.info("Welcome : User created successfully.")
