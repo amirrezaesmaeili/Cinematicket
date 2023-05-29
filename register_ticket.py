@@ -76,6 +76,15 @@ class UserEncoder(json.JSONEncoder):
         if isinstance(o, datetime.date):
             return o.isoformat()
         return super().default(o)
+    
+    # Example usage of the User class:
+user1 = User("John", datetime.date(1990, 5, 29), 8, 32)
+user2 = User("Jane", datetime.date(1995, 7, 12), 12, 27)
+user3 = User("Mike", datetime.date(1988, 9, 3), 6, 34)
+user4= User("Jacksone",datetime.date(2000,5,26),2,23)
+
+users = [user1, user2, user3,user4]
+
 
     
 
