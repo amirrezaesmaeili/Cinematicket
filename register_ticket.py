@@ -85,6 +85,10 @@ user4= User("Jacksone",datetime.date(2000,5,26),2,23)
 
 users = [user1, user2, user3,user4]
 
+# Clear the console screen
+os.system('cls')
+
+
 
     
 
