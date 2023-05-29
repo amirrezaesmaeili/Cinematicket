@@ -141,6 +141,8 @@ def main():
                         elif user_login_choice == "4":
                             sans_list = Cinema.get_all_sans()
                             for sans in sans_list:
+                                print("---------------------------")
+                                print(f"Film ID: {sans['id']}")
                                 print(f"Film Name: {sans['film_name']}")
                                 print(f"Film Genre: {sans['film_genre']}")
                                 print(f"Film Playing Time: {sans['film_play_time']}")
