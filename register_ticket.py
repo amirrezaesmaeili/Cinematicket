@@ -107,6 +107,15 @@ for user in users:
         print(f"User {user.name} can reserve the session.")
     except MyException as e:
         print(f"Error: {str(e)}")
+        
+
+# Check movie watching for each user
+movie_age_rating = 12
+for user in users:
+    if user.can_watch_movie(movie_age_rating):
+        print(f"User {user.name} can watch this movie.")
+    else:
+        print(f"User {user.name} cannot watch this movie.")
 
 
 
