@@ -47,6 +47,26 @@ class User:
         Check if the user can watch a movie based on its age rating.
         """
         return self.age_rating >= movie_age_rating
+    
+    def discount_apply(self, original_price: float) -> float:
+        """
+        Apply a discount to the original price based on the user's membership months or birthday.
+        """
+        if self.is_birthday():
+            # Calculate birthday discount (50%)
+            discount_percentage = 0.5
+        elif self.membership_months > 0:
+            # Calculate membership discount (5% per month)
+            discount_percentage = self.membership_months * 0.05
+        else:
+            # No discount available
+            discount_percentage = 0
+
+        discount_amount = original_price * discount_percentage
+        final_price = original_price - discount_amount
+        return final_price
+
+    
 
 
 
