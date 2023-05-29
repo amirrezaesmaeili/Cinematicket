@@ -65,6 +65,74 @@ class BankAccount(ABC):
     def to_rial(balance):
         return balance * 10
 
+class PasargadAccount(BankAccount):
+    __MINIMUM = 10_000
+    __accounts = []
+
+    def __init__(self, owner_name: str, balance: int, password: str, cvv2: str):
+        super().__init__(owner_name, balance, password, cvv2)
+        type(self).__accounts.append(self)
+
+    def __add__(self, amount: int):
+        if self._balance + amount < self.__MINIMUM:
+            raise ValueError("Invalid balance")
+
+        return super().__add__(amount)
+
+    def __sub__(self, amount: int):
+        if self._balance - amount < self.__MINIMUM:
+            raise ValueError("Invalid balance")
+
+        return super().__sub__(amount)
+
+    def transfer(self, other: "BankAccount", amount: int, password: str, cvv2: str):
+        if amount < 0:
+            logger.error("Raised")
+            raise ValueError("Invalid amount")
+
+        if not self.verify_password(password):
+            logger.error("Raised")
+            raise ValueError("Invalid password")
+
+        if not self.verify_cvv2(cvv2):
+            logger.error("Raised")
+            raise ValueError("Invalid cvv2")
+
+        self.balance -= (amount - 600)
+        other.balance += amount
+        logger.info("successfully transferred")
+
+    @classmethod
+    def maximum(cls) -> int:
+        return max([account.balance for account in cls.__accounts])
+
+    @classmethod
+    def save(cls):
+        data = [
+            {
+                "owner_name": account.owner_name,
+                "balance": account.balance,
+                "password": account._password_hash,
+                "cvv2": account._cvv2,
+            }
+            for account in cls.__accounts
+        ]
+        with open("account.json", "w", encoding="utf_8") as file:
+            json.dump(data, file , indent=4)
+
+    @classmethod
+    def load(cls):
+        with open("account.json", "r", encoding="utf_8") as file:
+            data = json.load(file)
+            cls.__accounts = [
+                cls(
+                    owner_name=account_data["owner_name"],
+                    balance=account_data["balance"],
+                    password=account_data["password"],
+                    cvv2=account_data["cvv2"],
+                )
+                for account_data in data
+            ]
 
 class ShahrBankAccount(BankAccount):
     __MINIMUM = 10_000
