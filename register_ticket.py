@@ -6,3 +6,4 @@ import json
 class MyException(Exception):
     pass
 
+class User:
