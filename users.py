@@ -1,8 +1,9 @@
 import uuid
 import hashlib
 import json
-import argparse
 from enum import Enum
+import os
+import platform
 
 class UserRole(Enum):
     MANAGER = "manager"
@@ -31,7 +32,7 @@ class User:
         """
         Return a string representation of the User object.
         """
-        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}\nUser Role{self.role}"
+        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}"
 
     @staticmethod
     def build_pass(password: str) -> str:
@@ -108,12 +109,9 @@ class User:
                 raise ValueError(validate)
             else:
                 password = cls.build_pass(password)
-                if UserRole.MANAGER.value in [user['role'] for user in cls.users.values()]:
-                    raise ValueError("An admin user already exists.")
-                else:
-                    user = cls(username, password, role=UserRole.MANAGER)
-                    user.save_to_database()
-                    return "\n>>>> Welcome: Manager created successfully. <<<<\n"
+                user = cls(username, password, role=UserRole.MANAGER)
+                user.save_to_database()
+                return "\n>>>> Welcome: Manager created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
     
@@ -150,16 +148,19 @@ class User:
             message: the username was updated successfully.
         """
         try:
-            if new_username in User.users:
-                raise ValueError("This username already exists.")
+            if self.username in User.users:
+                if new_username in User.users:
+                    raise ValueError("This username already exists.")
+                else:
+                    User.users.pop(self.username)
+                    self.username = new_username
+                    User.users[new_username] = self
+                    self.save_to_database()
+                    return "\n>>>> Username updated successfully. <<<<\n"
             else:
-                User.users.pop(self.username)
-                self.username = new_username
-                User.users[new_username] = self
-                self.save_to_database()
-                return "\n>>>> Username updated successfully. <<<<\n"
-        except ValueError as Err:
-            return str(Err)    
+                raise ValueError("The user does not exist.")
+        except ValueError as err:
+            return str(err)
 
     def update_telephone_number(self, new_telephone_number: str) -> str:
         """
@@ -172,9 +173,6 @@ class User:
             message: telephone number was updated successfully.
         """
         try:
-            if new_telephone_number in User.users:
-                raise ValueError("This telephone number already exists.")
-            else:
                 self.telephone_number = new_telephone_number
                 self.save_to_database()
                 return "\n>>>> Telephone number updated successfully. <<<<\n"
@@ -211,6 +209,7 @@ class User:
                 self._password = self.build_pass(new_password1)
                 self.save_to_database()
                 return "\n>>>> Password updated successfully. <<<<\n"
+           
         except ValueError as Err:
             return str(Err)
 
@@ -267,5 +266,10 @@ class User:
         """
         if len(password) < 4:
             raise ValueError("New password must be at least 4 characters long.")
-        
-    
+       
+    @staticmethod
+    def clear_screen():
+        if platform.system() == "Windows":
+            os.system("cls")    
+        else:
+            os.system("clear")        
