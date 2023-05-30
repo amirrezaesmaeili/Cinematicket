@@ -1,7 +1,14 @@
 import json
 import datetime
 from users import User
+import logging
 
+logger = logging.getLogger("CinemaLogger")
+logger.setLevel(level=logging.INFO)
+file_handler = logging.FileHandler("cinematicket.log")
+pattern = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(pattern)
+logger.addHandler(file_handler)
 
 class MyException(Exception):
     pass
@@ -45,10 +52,12 @@ class Cinema:
     @classmethod
     def create_sans(cls,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int,ticket_price: float):
         try:
-            cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity,ticket_price)
-            cinema_sans.save_sans_to_file()
-            return "\n>>>>  Sans created successfully. <<<<\n"
+                cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity)
+                cinema_sans.save_sans_to_file()
+                logger.info(f"Sans created successfully.")
+                return f"\n>>>>  Sans created successfully. <<<<\n"
         except ValueError as Err:
+            logger.error(Err)
             return str(Err)
 
     @classmethod
