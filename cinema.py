@@ -1,7 +1,14 @@
 import json
 import datetime
 from users import User
+import logging
 
+logger = logging.getLogger("CinemaLogger")
+logger.setLevel(level=logging.INFO)
+file_handler = logging.FileHandler("cinematicket.log")
+pattern = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(pattern)
+logger.addHandler(file_handler)
 
 class MyException(Exception):
     pass
@@ -9,7 +16,7 @@ class MyException(Exception):
 class Cinema:
     id_counter = 0
     sans={}
-    def __init__(self,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int):
+    def __init__(self,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int,ticket_price: float):
         Cinema.id_counter += 1
         self.id = Cinema.id_counter
         self.film_name = film_name
@@ -17,6 +24,7 @@ class Cinema:
         self.film_paly_time = film_play_time
         self.film_age_category = film_age_category
         self.capacity = capacity
+        self.ticket_price = ticket_price
         
     def save_sans_to_file(self):
         with open("Cinema_sans.json","w",encoding="utf_8") as file:
@@ -26,7 +34,8 @@ class Cinema:
                 "film_genre": self.film_genre,
                 "film_play_time": self.film_paly_time,
                 "film_age_category": self.film_age_category,
-                "capacity": self.capacity
+                "capacity": self.capacity,
+                "ticket_price":self.ticket_price,
             }
             Cinema.sans[self.film_name] = sans_data
             json.dump(Cinema.sans,file,indent=4)
@@ -41,12 +50,14 @@ class Cinema:
             Cinema.sans = {}   
             
     @classmethod
-    def create_sans(cls,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int):
+    def create_sans(cls,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int,ticket_price: float):
         try:
-            cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity)
-            cinema_sans.save_sans_to_file()
-            return "\n>>>>  Sans created successfully. <<<<\n"
+                cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity)
+                cinema_sans.save_sans_to_file()
+                logger.info(f"Sans created successfully.")
+                return f"\n>>>>  Sans created successfully. <<<<\n"
         except ValueError as Err:
+            logger.error(Err)
             return str(Err)
 
     @classmethod
@@ -66,6 +77,6 @@ class Cinema:
             raise MyException("Session time has passed.")
         if capacity is not None and capacity <= 0:
             raise MyException("Theater capacity is full.")
-        if self.film_age_category > user_age_category:
+        if self.film_age_category > User.user_age():
             raise MyException("You are not allowed to reserve or watch this film.")
         return True
