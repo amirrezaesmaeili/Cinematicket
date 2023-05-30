@@ -34,6 +34,52 @@ class User:
         """
         return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}"
 
+    def age_counter(self) -> int:
+        """
+        calculate and return user age.
+        """
+        today = dt.datetime.today()
+        user_birth = dt.datetime.strptime(self.birth, '%Y-%m-%d')
+        user_age = (today - user_birth).days // 365
+        logger.info(f"user age is {user_age}.")
+        return user_age
+
+    def calculate_membership(self) -> int:
+        """
+        calculate and return user membership time.
+        """
+        today = dt.date.today()
+        membership = (today - self.submit_date).days // 30
+        logger.info(f"user's membership is {membership}")
+        return membership
+
+    @classmethod
+    def sign_up(cls, username: str, password: str, role: str, birth: str, telephone_number=None):
+        cls.load_from_database()
+        if username in cls._users:
+            logger.error("This username already exists.")
+            raise ValueError("This username already exists.")
+        else:
+            validate = cls.validate_password(password)
+            if validate:
+                if role == "USER":
+                    if birth:
+                        logger.info("Creating User")
+                        cls.create_user(username, password, birth, telephone_number,role=UserRole.USER)
+                        return "Creating User"
+                    else:
+                        raise ValueError("Birthday field is required!")
+                elif role == "ADMIN":
+                    logger.info("Creating Admin")
+                    cls.create_admin(username, password,role=UserRole.ADMIN)
+                    return "Creating Admin"
+                elif role == "MANAGER":
+                    logger.info("Creating Manager")
+                    cls.create_manager(username, password, role=UserRole.MANAGER)
+                    return "Creating Manager"
+            else:
+                raise ValueError("Password must be at least 4 characters long.")
+
     @staticmethod
     def build_pass(password: str) -> str:
         """
