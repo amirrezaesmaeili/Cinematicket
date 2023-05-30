@@ -130,7 +130,10 @@ def main():
                                    message_update_username = user.update_username(new_username)
                                    print(message_update_username)
                             elif user_edit_choice == "2":
-                                new_telephone_number = input("Enter a new telephone number: ")
+                                new_telephone_number = input("Enter Your New Telephone Number In +98 Format: ")
+                                pattern = regex.compile(r"^\+98\d{10}$")
+                                if not pattern.match(telephone_number):
+                                    print("Phone number is invalid.")
                                 message_update_telephonenumber = user.update_telephone_number(new_telephone_number)
                                 print(message_update_telephonenumber)
                             else:            
