@@ -112,7 +112,7 @@ class User:
             password = cls.build_pass(password)
             id = str(uuid4())
             submit_date = dt.date.today()
-            user = cls(username, password, birth: str, id, submit_date, telephone_number,role=UserRole.USER)
+            user = cls(username, password, birth, id, submit_date, telephone_number,role=UserRole.USER)
             user.save_to_database()
             logger.info("Welcome : User created successfully.")
         except ValueError as Err:
