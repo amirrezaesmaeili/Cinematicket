@@ -3,6 +3,7 @@ from cinema import Cinema
 import getpass
 import argparse
 import datetime
+import re as regex
 
 def main():
     User.clear_screen()          
@@ -86,7 +87,12 @@ def main():
                 User.clear_screen()
                 username = input("Enter a username: \n")
                 password = getpass.getpass("Enter a password (at least 4 characters): \n")
-                telephone_number = input("Enter a telephone number (optional): \n")
+                telephone_number = input("Enter Your Telephone Number In +98 Format: \n")
+                pattern = regex.compile(r"^\+98\d{10}$")
+                if pattern.match(telephone_number):
+                    print("Phone number is valid.")
+                else:
+                    print("Phone number is invalid.")
                 message_create_user = User.create_user(username, password, telephone_number)
                 print(message_create_user)
                 
