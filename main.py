@@ -2,6 +2,7 @@ from users import User
 from cinema import Cinema
 import getpass
 import argparse
+import datetime
 
 def main():
     User.clear_screen()          
@@ -113,8 +114,8 @@ def main():
 
                         elif  user_login_choice == "2":
                             User.clear_screen()
-                            print("1. Edit username")
-                            print("2. Edit phone number")
+                            print("1: Edit username")
+                            print("2: Edit phone number")
                             user_edit_choice = input("Enter choice: ")
                             if user_edit_choice == "1":
                                 new_username = input("Enter a new username: ")
@@ -139,16 +140,48 @@ def main():
                             print(message_update_password)
 
                         elif user_login_choice == "4":
-                            sans_list = Cinema.get_all_sans()
-                            for sans in sans_list:
-                                print("---------------------------")
-                                print(f"Film ID: {sans['id']}")
-                                print(f"Film Name: {sans['film_name']}")
-                                print(f"Film Genre: {sans['film_genre']}")
-                                print(f"Film Playing Time: {sans['film_play_time']}")
-                                print(f"Age Category: {sans['film_age_category']}")
-                                print(f"Capacity: {sans['capacity']}")
-                                print("---------------------------")
+                            print("1: Cinema Sans")
+                            print("2: Reserve Sans")
+                            user_cinema_choice = input("Enter choice: ")
+                            if user_cinema_choice == "1":
+                                sans_list = Cinema.get_all_sans()
+                                for sans in sans_list:
+                                    print("---------------------------")
+                                    print(f"Film ID: {sans['id']}")
+                                    print(f"Film Name: {sans['film_name']}")
+                                    print(f"Film Genre: {sans['film_genre']}")
+                                    print(f"Film Playing Time: {sans['film_play_time']}")
+                                    print(f"Age Category: {sans['film_age_category']}")
+                                    print(f"Capacity: {sans['capacity']}")
+                                    print("---------------------------")
+                            elif user_cinema_choice == "2":
+                                sans_list = Cinema.get_all_sans()
+                                film_name = input("Enter The Film Name For Reserving: ")
+                                film_play_time = input("Enter The Film Playing Time: ")
+
+                                for sans in sans_list:
+                                    if sans['film_name'] == film_name and sans['film_play_time'] == film_play_time:
+                                        capacity = int(input("Enter the number of seats to reserve: "))
+                                        try:
+                                            cinema_sans = Cinema(sans['film_name'], sans['film_genre'], sans['film_play_time'], sans['film_age_category'], sans['capacity'])
+                                            can_reserve = cinema_sans.can_reserve_sans(film_play_time, capacity)
+                                            if can_reserve:
+                                                cinema_sans.capacity = int(cinema_sans.capacity)
+                                                capacity = int(capacity)
+                                                if capacity <= cinema_sans.capacity:
+                                                    cinema_sans.capacity -= capacity
+                                                    cinema_sans.save_sans_to_file()
+                                                    print(f"\n>>>> Seats reserved successfully. Remaining capacity: {cinema_sans.capacity} <<<<\n")
+                                                else:
+                                                    print("\n>>>> Insufficient capacity. <<<<\n")
+                                        except ValueError as e:
+                                            print(str(e))
+                                        break
+                                else:
+                                    print("\n>>>> Sans not found. <<<<\n")
+
+                                
+                                    
                                             
                         elif user_login_choice == "5":
                             break
@@ -170,4 +203,4 @@ def main():
         
 if __name__ == "__main__":
     main()
-    
+   

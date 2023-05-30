@@ -1,4 +1,10 @@
 import json
+import datetime
+from users import User
+
+
+class MyException(Exception):
+    pass
 
 class Cinema:
     id_counter = 0
@@ -47,3 +53,19 @@ class Cinema:
     def get_all_sans(cls):
         cls.load_sans_from_file()
         return list(cls.sans.values())            
+
+    def can_reserve_sans(self, film_play_time: str, capacity: int) -> bool:
+        """
+        Check if the user can reserve a session.
+        """
+        film_play_time = datetime.datetime.strptime(film_play_time, "%H:%M").time()
+        film_formatted_time = film_play_time.strftime("%H:%M")
+        current_time = datetime.datetime.now()
+        current_formatted_time = current_time.strftime("%H:%M")
+        if film_formatted_time < current_formatted_time:
+            raise MyException("Session time has passed.")
+        if capacity is not None and capacity <= 0:
+            raise MyException("Theater capacity is full.")
+        if self.film_age_category > user_age_category:
+            raise MyException("You are not allowed to reserve or watch this film.")
+        return True
