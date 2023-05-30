@@ -4,7 +4,7 @@ import getpass
 import argparse
 
 def main():
-    User.clear_screen()          
+    User.clear_screen()        
     parser = argparse.ArgumentParser(description="User Login")
     parser.add_argument("-m","--manager", action="store_true", help="Create an admin user")
     parser.add_argument('-u',"--username", type=str, help="Username")
@@ -13,6 +13,7 @@ def main():
 
     if args.manager:
         User.create_manager_from_args(args)
+        print("\n>>>> Welcome: Manager created successfully. <<<<\n")
         User.get_manager_details()
         
         
@@ -46,9 +47,9 @@ def main():
                     User.clear_screen()
                     username = input("Enter a username for admin: \n")
                     password = getpass.getpass("Enter a password (at least 4 characters): \n")
-                    message_create_user = User.create_admin(username, password)
-                    print(message_create_user)
-                    
+                    role = "ADMIN"
+                    User.sign_up(username, password, role)
+                    print("\n>>>> Welcome : Admin created successfully. <<<<\n")                    
                 
                 elif manager_choice == "2":
                     User.clear_screen()
@@ -86,8 +87,9 @@ def main():
                 username = input("Enter a username: \n")
                 password = getpass.getpass("Enter a password (at least 4 characters): \n")
                 telephone_number = input("Enter a telephone number (optional): \n")
-                message_create_user = User.create_user(username, password, telephone_number)
-                print(message_create_user)
+                role = "USER"
+                User.sign_up(username, password, role, telephone_number)
+                print("\n>>>> Welcome : User created successfully. <<<<\n")
                 
             
             elif user_choice == "2":
@@ -95,8 +97,8 @@ def main():
                 username = input("Enter your username: \n")
                 password = User.build_pass(getpass.getpass("Enter your password: \n"))
                 User.load_from_database()
-                if username in User.users and User.users[username]["password"] == password:
-                    user = User(username, User.users[username]["password"], User.users[username]["telephone_number"])
+                if username in User._users and User._users[username]["password"] == password:
+                    user = User(username, User._users[username]["password"], User._users[username]["telephone_number"])
                     
                     while True:
                         print("User menu:")
@@ -118,15 +120,15 @@ def main():
                             user_edit_choice = input("Enter choice: ")
                             if user_edit_choice == "1":
                                 new_username = input("Enter a new username: ")
-                                if new_username in User.users:
+                                if new_username in User._users:
                                    print("Username already exists.")
                                 else:
-                                   message_update_username = user.update_username(new_username)
-                                   print(message_update_username)
+                                   user.update_username(new_username)
+                                   print("\n>>>> The username was updated successfully. <<<<\n")
                             elif user_edit_choice == "2":
                                 new_telephone_number = input("Enter a new telephone number: ")
-                                message_update_telephonenumber = user.update_telephone_number(new_telephone_number)
-                                print(message_update_telephonenumber)
+                                user.update_telephone_number(new_telephone_number)
+                                print("\n>>>> Telephone number was updated successfully. <<<<\n")
                             else:            
                               print("\n>>>> Invalid choice <<<<\n")
                                 
@@ -135,8 +137,8 @@ def main():
                             old_password = getpass.getpass("Enter your old password: ")
                             new_password1 = getpass.getpass("Enter your new password: ")
                             new_password2 = getpass.getpass("Enter your new password again: ")
-                            message_update_password = user.update_password(old_password, new_password1, new_password2)
-                            print(message_update_password)
+                            user.update_password(old_password, new_password1, new_password2)
+                            print("\n>>>> Password updated successfully. <<<<\n")
 
                         elif user_login_choice == "4":
                             sans_list = Cinema.get_all_sans()

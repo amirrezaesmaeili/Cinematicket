@@ -1,4 +1,4 @@
-import uuid
+from uuid import uuid4
 import hashlib
 import json
 from enum import Enum
@@ -19,9 +19,9 @@ class UserRole(Enum):
     USER = "user"
 
 class User:
-    users = {}
+    _users = {}
 
-    def __init__(self, username: str, password: str, telephone_number= None,role=UserRole.USER) -> None:
+    def __init__(self, username: str, password: str, id, telephone_number= None, role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -33,6 +33,7 @@ class User:
         self.username = username
         self._password = password
         self.telephone_number = telephone_number
+        self.id = id
         self.role = role
 
     def __str__(self) -> str:
@@ -53,6 +54,28 @@ class User:
         return p_hash.hexdigest()
 
     @classmethod
+    def sign_up(cls, username, password, role, telephone_number=None):
+        cls.load_from_database()
+        if username in cls._users:
+            logger.error("This username already exists.")
+            raise ValueError("This username already exists.")
+        else:
+            validate = cls.validate_password(password)
+            if validate:
+                if role == "USER":
+                    logger.info("Creating User")
+                    cls.create_user(username, password, telephone_number,role=UserRole.USER)
+                    return "\n>>>> Welcome: User created successfully. <<<<\n"
+                elif role == "ADMIN":
+                    logger.info("Creating Admin")
+                    cls.create_admin(username, password,role=UserRole.ADMIN)
+                elif role == "MANAGER":
+                    logger.info("Creating Manager")
+                    cls.create_manager(username, password, role=UserRole.MANAGER)
+            else:
+                raise ValueError("Password must be at least 4 characters long.")
+
+    @classmethod
     def create_user(cls, username: str, password: str, telephone_number: str = None,role=UserRole.USER) -> str:
         """
         Create a new user and save it to the database.
@@ -63,22 +86,13 @@ class User:
             telephone_number: The telephone number for the new user. Defaults to None.
         """
         try:
-            cls.load_from_database()
-            validate = cls.validate_password(password)
-
-            if username in cls.users:
-                logger.error("This username already exists.")
-                raise ValueError("This username already exists.")
-            elif validate is not None:
-                raise ValueError(validate)
-            else:
-                password = cls.build_pass(password)
-                self.id = str(uuid.uuid4())
-                user = cls(username, password, telephone_number,role=UserRole.USER)
-                user.save_to_database()
-                logger.info("Welcome : User created successfully.")
-                return "\n>>>> Welcome : User created successfully. <<<<\n"
+            password = cls.build_pass(password)
+            id = str(uuid4())
+            user = cls(username, password, id, telephone_number,role=UserRole.USER)
+            user.save_to_database()
+            logger.info("Welcome : User created successfully.")
         except ValueError as Err:
+            logger.error(Err)
             return str(Err)
         
     @classmethod
@@ -92,55 +106,39 @@ class User:
             telephone_number: The telephone number for the new user. Defaults to None.
         """
         try:
-            cls.load_from_database()
-            validate = cls.validate_password(password)
-
-            if username in cls.users:
-                logger.error("This username already exists.")
-                raise ValueError("This username already exists.")
-            elif validate is not None:
-                raise ValueError(validate)
-            else:
-                password = cls.build_pass(password)
-                user = cls(username, password,role=UserRole.ADMIN)
-                user.save_to_database()
-                logger.info("Welcome : Admin created successfully.")
-                return "\n>>>> Welcome : Admin created successfully. <<<<\n"
+            password = cls.build_pass(password)
+            user = cls(username, password,role=UserRole.ADMIN)
+            user.save_to_database()
+            logger.info("Welcome : Admin created successfully.")
         except ValueError as Err:
+            logger.error(Err)
             return str(Err)
         
     @classmethod
     def create_manager(cls, username: str, password: str,role=UserRole.MANAGER) -> str:
         try:
-            cls.load_from_database()
-            validate = cls.validate_password(password)
-
-            if username in cls.users:
-                logger.error("This username already exists.")
-                raise ValueError("This username already exists.")
-            elif validate is not None:
-                raise ValueError(validate)
-            else:
-                password = cls.build_pass(password)
-                user = cls(username, password, role=UserRole.MANAGER)
-                user.save_to_database()
-                logger.info("Welcome : Manager created successfully.")
-                return "\n>>>> Welcome: Manager created successfully. <<<<\n"
+            password = cls.build_pass(password)
+            user = cls(username, password, role=UserRole.MANAGER)
+            user.save_to_database()
+            logger.info("Welcome : Manager created successfully.")
+            return "\n>>>> Welcome: Manager created successfully. <<<<\n"
         except ValueError as Err:
+            logger.error(Err)
             return str(Err)
     
     @classmethod
     def create_manager_from_args(cls, args):
         username = args.username
         password = args.password
-
-        message_create_user = cls.create_manager(username, password, UserRole.MANAGER)
-        print(message_create_user)
+        role = "MANAGER"
+        cls.sign_up(username, password, role)
+        # message_create_user = cls.create_manager(username, password, UserRole.MANAGER)
+        # print(message_create_user)
 
     @classmethod
     def get_manager_details(cls):
         manager_username = None
-        for username, user_info in cls.users.items():
+        for username, user_info in cls._users.items():
             if user_info["role"] == UserRole.MANAGER.value:
                 manager_username = username
                 break
@@ -165,22 +163,14 @@ class User:
             message: the username was updated successfully.
         """
         try:
-            if self.username in User.users:
-                if new_username in User.users:
-                    logger.error("This username already exists.")
-                    raise ValueError("This username already exists.")
-                else:
-                    User.users.pop(self.username)
-                    self.username = new_username
-                    User.users[new_username] = self
-                    self.save_to_database()
-                    logger.info("Username updated successfully.")
-                    return "\n>>>> Username updated successfully. <<<<\n"
-            else:
-                logger.error("The user does not exist.")
-                raise ValueError("The user does not exist.")
-        except ValueError as err:
-            return str(err)
+            User._users.pop(self.username)
+            self.username = new_username
+            User._users[new_username] = self
+            self.save_to_database()
+            logger.info("The username was updated successfully")
+        except ValueError as Err:
+            logger.error(Err)
+            return str(Err)    
 
     def update_telephone_number(self, new_telephone_number: str) -> str:
         """
@@ -189,15 +179,13 @@ class User:
         Args:
             new_telephone_number: The new telephone number set.
 
-        Returns:
-            message: telephone number was updated successfully.
         """
         try:
-                self.telephone_number = new_telephone_number
-                self.save_to_database()
-                logger.info("Telephone number updated successfully.")
-                return "\n>>>> Telephone number updated successfully. <<<<\n"
+            self.telephone_number = new_telephone_number
+            self.save_to_database()
+            logger.info("Telephone number was updated successfully.")
         except ValueError as Err:
+            logger.error(Err)
             return str(Err)
 
     def update_password(self, old_password: str, new_password1: str, new_password2: str) -> str:
@@ -210,7 +198,7 @@ class User:
             new_password2: The new password confirmation.
 
         Returns:
-            message: password was updated successfully
+            raise value eror if password is wrong.
         """
         try:
             new_pass = self.validate_newpass(new_password1, new_password2)
@@ -234,9 +222,7 @@ class User:
             else:
                 self._password = self.build_pass(new_password1)
                 self.save_to_database()
-                logger.info("Password updated successfully.")
-                return "\n>>>> Password updated successfully. <<<<\n"
-           
+                logger.info("Password updated successfully.")          
         except ValueError as Err:
             logger.error(Err)
             return str(Err)
@@ -270,8 +256,8 @@ class User:
                 "telephone_number": self.telephone_number,
                 "role": self.role.value,
             }
-            User.users[self.username] = user_data
-            json.dump(User.users, file, indent=4)
+            User._users[self.username] = user_data
+            json.dump(User._users, file, indent=4)
 
     @classmethod
     def load_from_database(cls) -> None:
@@ -280,10 +266,10 @@ class User:
         """
         try:
             with open("database.json", "r", encoding="utf_8") as file:
-                User.users = json.load(file)
+                User._users = json.load(file)
        
         except FileNotFoundError:
-            User.users = {}
+            User._users = {}
             
     @staticmethod
     def validate_password(password: str) -> str:
@@ -294,12 +280,19 @@ class User:
             password: The password to be validated.
         """
         if len(password) < 4:
+            return False
             logger.error("New password must be at least 4 characters long.")
-            raise ValueError("New password must be at least 4 characters long.")
-       
+        return True
+     
     @staticmethod
     def clear_screen():
         if platform.system() == "Windows":
             os.system("cls")    
         else:
-            os.system("clear")        
+            os.system("clear")      
+
+
+
+#user = User.create_user("mah", "aban")
+# print(type(user.role))
+# print(user.role.value)
