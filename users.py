@@ -26,7 +26,7 @@ class UserRole(Enum):
 class User:
     users = {}
 
-    def __init__(self, username: str, password: str, telephone_number= None,role=UserRole.USER) -> None:
+    def __init__(self, username: str, password: str,date_of_birth: str, telephone_number= None,role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -37,9 +37,12 @@ class User:
         """
         self.username = username
         self._password = password
+        self.date_of_birth = date_of_birth
         self.telephone_number = telephone_number
         self.id = str(uuid.uuid4())
         self.role = role
+        self.registration_date = datetime.datetime.now()
+
 
     def __str__(self) -> str:
         """
@@ -246,6 +249,11 @@ class User:
             logger.error(Err)
             return str(Err)
 
+    def user_age(self):
+        today = datetime.datetime.today()
+        user_birth = datetime.datetime.strptime(self.date_of_birth, '%Y-%m-%d')
+        return (today - user_birth).days // 365
+    
     @staticmethod
     def validate_newpass(pass1: str, pass2: str) -> str:
         """
@@ -308,3 +316,42 @@ class User:
             os.system("cls")    
         else:
             os.system("clear") 
+                
+    # def is_birthday(self) -> bool:
+    #     """
+    #     Check if it's the user's birthday today.
+    #     """
+    #     today = datetime.date.today()
+    #     return today.month == self.birthdate.month and today.day == self.birthdate.day
+
+    # def can_get_discount(self) -> bool:
+    #     """
+    #     Check if the user is eligible for a discount.
+    #     """
+    #     return self.is_birthday() and self.membership_months > 0
+
+    # def can_reserve_session(self, session_time: datetime.datetime, theater_capacity: int = None) -> bool:
+    #     """
+    #     Check if the user can reserve a session.
+    #     """
+    #     if session_time < datetime.datetime.now():
+    #         raise MyException("Session time has passed.")
+    #     if theater_capacity is not None and theater_capacity <= 0:
+    #         raise MyException("Theater capacity is full.")
+    #     return True
+
+    # def can_watch_movie(self, movie_age_rating: int) -> bool:
+    #     """
+    #     Check if the user can watch a movie based on its age rating.
+    #     """
+    #     return self.age_rating >= movie_age_rating
+
+    # def discount_apply(self, original_price: float) -> float:
+    #     """
+    #     Apply a discount to the original price based on the user's membership months.
+    #     """
+    #     discount_percentage = self.membership_months * 0.1
+    #     discount_amount = original_price * discount_percentage
+    #     final_price = original_price - discount_amount
+    #     return final_price              
+    
