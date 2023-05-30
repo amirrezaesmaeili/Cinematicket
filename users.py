@@ -59,7 +59,7 @@ class User:
         today = dt.datetime.today()
         user_birth = dt.datetime.strptime(self.birth, '%Y-%m-%d')
         user_age = (today - user_birth).days // 365
-        logger.info(f"{self.username} is {user_age} years old.")
+        logger.info(f"user age is {user_age}.")
         return user_age
 
     def calculate_membership(self) -> int:
@@ -67,8 +67,8 @@ class User:
         calculate and return user membership time.
         """
         today = dt.date.today()
-        membership = today - self.submit_date
-        logger.info(f"{self.username}'s membership is {membership}")
+        membership = (today - self.submit_date).days // 30
+        logger.info(f"user's membership is {membership}.")
         return membership
 
     @staticmethod
