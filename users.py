@@ -21,7 +21,7 @@ class UserRole(Enum):
 class User:
     _users = {}
 
-    def __init__(self, username: str, password: str, id, telephone_number= None, role=UserRole.USER) -> None:
+    def __init__(self, username: str, password: str, birth: str, id: str, submit_date, telephone_number= None, role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -32,6 +32,8 @@ class User:
         """
         self.username = username
         self._password = password
+        self.birth = birth
+        self.submit_date = submit_date
         self.telephone_number = telephone_number
         self.id = id
         self.role = role
@@ -41,6 +43,25 @@ class User:
         Return a string representation of the User object.
         """
         return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}"
+
+    def age_counter(self) -> int:
+        """
+        calculate and return user age.
+        """
+        today = dt.datetime.today()
+        user_birth = dt.datetime.strptime(self.birth, '%Y-%m-%d')
+        user_age = (today - user_birth).days // 365
+        logger.info(f"{self.username} is {user_age} years old.")
+        return user_age
+
+    def calculate_membership(self) -> int:
+        """
+        calculate and return user membership time.
+        """
+        today = dt.date.today()
+        membership = today - self.submit_date
+        logger.info(f"{self.username}'s membership is {membership}")
+        return membership
 
     @staticmethod
     def build_pass(password: str) -> str:
@@ -54,7 +75,7 @@ class User:
         return p_hash.hexdigest()
 
     @classmethod
-    def sign_up(cls, username, password, role, telephone_number=None):
+    def sign_up(cls, username: str, password: str, role: str, birth: str, telephone_number=None):
         cls.load_from_database()
         if username in cls._users:
             logger.error("This username already exists.")
@@ -63,9 +84,11 @@ class User:
             validate = cls.validate_password(password)
             if validate:
                 if role == "USER":
-                    logger.info("Creating User")
-                    cls.create_user(username, password, telephone_number,role=UserRole.USER)
-                    return "\n>>>> Welcome: User created successfully. <<<<\n"
+                    if birth:
+                        logger.info("Creating User")
+                        cls.create_user(username, password, birth, telephone_number,role=UserRole.USER)
+                    else:
+                        raise ValueError("Birthday field is required!")
                 elif role == "ADMIN":
                     logger.info("Creating Admin")
                     cls.create_admin(username, password,role=UserRole.ADMIN)
@@ -76,7 +99,7 @@ class User:
                 raise ValueError("Password must be at least 4 characters long.")
 
     @classmethod
-    def create_user(cls, username: str, password: str, telephone_number: str = None,role=UserRole.USER) -> str:
+    def create_user(cls, username: str, password: str, birth: str, telephone_number: str = None,role=UserRole.USER) -> str:
         """
         Create a new user and save it to the database.
 
@@ -88,7 +111,8 @@ class User:
         try:
             password = cls.build_pass(password)
             id = str(uuid4())
-            user = cls(username, password, id, telephone_number,role=UserRole.USER)
+            submit_date = dt.date.today()
+            user = cls(username, password, birth: str, id, submit_date, telephone_number,role=UserRole.USER)
             user.save_to_database()
             logger.info("Welcome : User created successfully.")
         except ValueError as Err:
@@ -253,6 +277,8 @@ class User:
                 "id": self.id,
                 "username": self.username,
                 "password": self._password,
+                "birthday": self.birth,
+                "submit_date": self.submit_date,
                 "telephone_number": self.telephone_number,
                 "role": self.role.value,
             }

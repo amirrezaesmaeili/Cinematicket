@@ -86,9 +86,10 @@ def main():
                 User.clear_screen()
                 username = input("Enter a username: \n")
                 password = getpass.getpass("Enter a password (at least 4 characters): \n")
+                birth = input("Enter your birthday (yyyy-mm-dd):")
                 telephone_number = input("Enter a telephone number (optional): \n")
                 role = "USER"
-                User.sign_up(username, password, role, telephone_number)
+                User.sign_up(username, password, role, birth, telephone_number)
                 print("\n>>>> Welcome : User created successfully. <<<<\n")
                 
             
