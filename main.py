@@ -4,6 +4,7 @@ import getpass
 import argparse
 import datetime
 import re as regex
+import logging
 
 def main():
     User.clear_screen()          
