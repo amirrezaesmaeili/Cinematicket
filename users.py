@@ -5,7 +5,7 @@ from enum import Enum
 import os
 import platform
 import logging
-import datetime
+import datetime as dt
 
 logger = logging.getLogger("UserLogger")
 logger.setLevel(level=logging.INFO)
