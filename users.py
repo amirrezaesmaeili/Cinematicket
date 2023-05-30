@@ -5,6 +5,7 @@ from enum import Enum
 import os
 import platform
 import logging
+import datetime
 
 logger = logging.getLogger("UserLogger")
 logger.setLevel(level=logging.INFO)
@@ -12,6 +13,10 @@ file_handler = logging.FileHandler("cinematicket.log")
 pattern = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(pattern)
 logger.addHandler(file_handler)
+
+
+class MyException(Exception):
+    pass
 
 class UserRole(Enum):
     MANAGER = "manager"
@@ -302,4 +307,4 @@ class User:
         if platform.system() == "Windows":
             os.system("cls")    
         else:
-            os.system("clear")        
+            os.system("clear") 
