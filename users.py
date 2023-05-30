@@ -26,7 +26,7 @@ class UserRole(Enum):
 class User:
     users = {}
 
-    def __init__(self, username: str, password: str,date_of_birth: datetime.date,membership_months: int, telephone_number= None,role=UserRole.USER) -> None:
+    def __init__(self, username: str, password: str,date_of_birth: datetime.date, telephone_number= None,role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -38,7 +38,6 @@ class User:
         self.username = username
         self._password = password
         self.date_of_birth = date_of_birth
-        self.membership_months = membership_months
         self.telephone_number = telephone_number
         self.role = role
         self.id = str(uuid.uuid4())
