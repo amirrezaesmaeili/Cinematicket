@@ -11,6 +11,7 @@ def main():
     parser.add_argument("-m","--manager", action="store_true", help="Create an admin user")
     parser.add_argument('-u',"--username", type=str, help="Username")
     parser.add_argument('-p',"--password", type=str, help="Password")
+    parser.add_argument('-b',"--birthday", type=str, help="birthday")
     args = parser.parse_args()
 
     if args.manager:
@@ -88,11 +89,12 @@ def main():
                 User.clear_screen()
                 username = input("Enter a username: \n")
                 password = getpass.getpass("Enter a password (at least 4 characters): \n")
+                date_of_birth = input("Enter Your Birthday In YYYY-MM-DD Format: \n")
                 telephone_number = input("Enter Your Telephone Number In +98 Format: \n")
                 pattern = regex.compile(r"^\+98\d{10}$")
                 if not pattern.match(telephone_number):
                     raise ValueError("Phone number is invalid.")
-                message_create_user = User.create_user(username, password, telephone_number)
+                message_create_user = User.create_user(username, password,date_of_birth, telephone_number)
                 print(message_create_user)
                 
             
@@ -102,7 +104,7 @@ def main():
                 password = User.build_pass(getpass.getpass("Enter your password: \n"))
                 User.load_from_database()
                 if username in User.users and User.users[username]["password"] == password:
-                    user = User(username, User.users[username]["password"], User.users[username]["telephone_number"])
+                    user = User(username, User.users[username]["password"], User.users[username]["telephone_number"], User.users[username]["birthday"])
                     
                     while True:
                         print("User menu:")

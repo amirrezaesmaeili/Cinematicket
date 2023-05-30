@@ -48,7 +48,7 @@ class User:
         """
         Return a string representation of the User object.
         """
-        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}"
+        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}\nBirthday: {self.date_of_birth}"
 
     @staticmethod
     def build_pass(password: str) -> str:
@@ -90,7 +90,7 @@ class User:
             return str(Err)
         
     @classmethod
-    def create_admin(cls, username: str, password: str,role=UserRole.ADMIN) -> str:
+    def create_admin(cls, username: str, password: str, date_of_birth:datetime.datetime = None,role=UserRole.ADMIN) -> str:
         """
         Create a new user and save it to the database.
 
@@ -110,7 +110,7 @@ class User:
                 raise ValueError(validate)
             else:
                 password = cls.build_pass(password)
-                user = cls(username, password,role=UserRole.ADMIN)
+                user = cls(username, password, date_of_birth,role=UserRole.ADMIN)
                 user.save_to_database()
                 logger.info("Welcome : Admin created successfully.")
                 return "\n>>>> Welcome : Admin created successfully. <<<<\n"
@@ -118,7 +118,7 @@ class User:
             return str(Err)
         
     @classmethod
-    def create_manager(cls, username: str, password: str,role=UserRole.MANAGER) -> str:
+    def create_manager(cls, username: str, password: str, date_of_birth: datetime.date = None, role=UserRole.MANAGER) -> str:
         try:
             cls.load_from_database()
             validate = cls.validate_password(password)
@@ -130,7 +130,7 @@ class User:
                 raise ValueError(validate)
             else:
                 password = cls.build_pass(password)
-                user = cls(username, password, role=UserRole.MANAGER)
+                user = cls(username, password, date_of_birth, role=UserRole.MANAGER)
                 user.save_to_database()
                 logger.info("Welcome : Manager created successfully.")
                 return "\n>>>> Welcome: Manager created successfully. <<<<\n"
@@ -141,8 +141,9 @@ class User:
     def create_manager_from_args(cls, args):
         username = args.username
         password = args.password
+        birthday = args.birthday
 
-        message_create_user = cls.create_manager(username, password, UserRole.MANAGER)
+        message_create_user = cls.create_manager(username, password,birthday, UserRole.MANAGER)
         print(message_create_user)
 
     @classmethod
