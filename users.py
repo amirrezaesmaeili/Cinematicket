@@ -324,17 +324,13 @@ class User:
         today = datetime.date.today()
         return today.month == self.date_of_birth.month and today.day == self.date_of_birth.day
 
-
-    def discount_apply(self, original_price: float) -> float:
+    
+    def calculate_membership_months(self) -> int:
         """
-        Apply a discount to the original price.
+        Calculate the number of months the user has been a member.
         """
-        if self.is_birthday():
-            final_price = original_price * 0.5
-        else:
-            discount_percentage = self.membership_months * 0.1
-            discount_amount = original_price * discount_percentage
-            final_price = original_price - discount_amount
-        return final_price         
- 
+        today = datetime.date.today()
+        registration_date = self.registration_date
+        months_diff = (today.year - registration_date.year) * 12 + (today.month - registration_date.month)
+        return months_diff
                         
