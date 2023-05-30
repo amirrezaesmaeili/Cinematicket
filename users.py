@@ -62,7 +62,7 @@ class User:
         return p_hash.hexdigest()
 
     @classmethod
-    def create_user(cls, username: str, password: str, telephone_number: str = None,role=UserRole.USER) -> str:
+    def create_user(cls, username: str, password: str,date_of_birth: datetime.date, telephone_number: str = None,role=UserRole.USER) -> str:
         """
         Create a new user and save it to the database.
 
@@ -82,7 +82,7 @@ class User:
                 raise ValueError(validate)
             else:
                 password = cls.build_pass(password)
-                user = cls(username, password, telephone_number,role=UserRole.USER)
+                user = cls(username, password,date_of_birth, telephone_number,role=UserRole.USER)
                 user.save_to_database()
                 logger.info("Welcome : User created successfully.")
                 return "\n>>>> Welcome : User created successfully. <<<<\n"
@@ -280,6 +280,7 @@ class User:
                 "id": self.id,
                 "username": self.username,
                 "password": self._password,
+                "birthday":self.date_of_birth,
                 "telephone_number": self.telephone_number,
                 "role": self.role.value,
             }

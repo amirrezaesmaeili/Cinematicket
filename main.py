@@ -67,7 +67,7 @@ def main():
                     
             else:
                 print("You Have No Permissions")
-                User.clear_screen()
+                # User.clear_screen()
                 
         elif choice == "2":
             User.clear_screen()
