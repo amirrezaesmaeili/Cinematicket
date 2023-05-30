@@ -1,6 +1,7 @@
 import json
 import datetime
 from users import User
+import logging
 
 
 class MyException(Exception):
