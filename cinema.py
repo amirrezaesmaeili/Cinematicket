@@ -3,6 +3,12 @@ import datetime
 from users import User
 import logging
 
+logger = logging.getLogger("CinemaLogger")
+logger.setLevel(level=logging.INFO)
+file_handler = logging.FileHandler("cinematicket.log")
+pattern = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(pattern)
+logger.addHandler(file_handler)
 
 class MyException(Exception):
     pass
