@@ -113,8 +113,8 @@ def main():
 
                         elif  user_login_choice == "2":
                             User.clear_screen()
-                            print("1. Edit username")
-                            print("2. Edit phone number")
+                            print("1: Edit username")
+                            print("2: Edit phone number")
                             user_edit_choice = input("Enter choice: ")
                             if user_edit_choice == "1":
                                 new_username = input("Enter a new username: ")
@@ -139,16 +139,23 @@ def main():
                             print(message_update_password)
 
                         elif user_login_choice == "4":
-                            sans_list = Cinema.get_all_sans()
-                            for sans in sans_list:
-                                print("---------------------------")
-                                print(f"Film ID: {sans['id']}")
-                                print(f"Film Name: {sans['film_name']}")
-                                print(f"Film Genre: {sans['film_genre']}")
-                                print(f"Film Playing Time: {sans['film_play_time']}")
-                                print(f"Age Category: {sans['film_age_category']}")
-                                print(f"Capacity: {sans['capacity']}")
-                                print("---------------------------")
+                            print("1: Cinema Sans")
+                            print("2: Reserve Sans")
+                            user_cinema_choice = input("Enter choice: ")
+                            if user_cinema_choice == "1":
+                                sans_list = Cinema.get_all_sans()
+                                for sans in sans_list:
+                                    print("---------------------------")
+                                    print(f"Film ID: {sans['id']}")
+                                    print(f"Film Name: {sans['film_name']}")
+                                    print(f"Film Genre: {sans['film_genre']}")
+                                    print(f"Film Playing Time: {sans['film_play_time']}")
+                                    print(f"Age Category: {sans['film_age_category']}")
+                                    print(f"Capacity: {sans['capacity']}")
+                                    print("---------------------------")
+                            elif user_cinema_choice == "2":
+                                pass
+                                    
                                             
                         elif user_login_choice == "5":
                             break
