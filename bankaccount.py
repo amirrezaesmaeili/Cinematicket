@@ -2,7 +2,6 @@ import json
 import logging
 from argparse import ArgumentParser
 from abc import ABC
-from hashlib import sha256
 
 
 logger = logging.getLogger("MyLogger")
@@ -23,7 +22,7 @@ class BankAccount(ABC):
     def __init__(self, owner_name: str, balance: int, password: str, cvv2: str):
         self.owner_name = owner_name
         self._balance = balance
-        self._password_hash = self._hash_password(password)
+        self._password = password
         self._cvv2 = cvv2
 
     @property
@@ -51,12 +50,8 @@ class BankAccount(ABC):
     def __sub__(self, amount: int):
         return self._balance - amount
 
-    def _hash_password(self, password: str) -> str:
-        return sha256(password.encode()).hexdigest()
-
     def verify_password(self, password: str) -> bool:
-        hashed_password = self._hash_password(password)
-        return self._password_hash == hashed_password
+        return self._password == password
 
     def verify_cvv2(self, cvv2: str) -> bool:
         return self._cvv2 == cvv2
@@ -65,7 +60,8 @@ class BankAccount(ABC):
     def to_rial(balance):
         return balance * 10
 
-class PasargadAccount(BankAccount):
+
+class PasargardAccount(BankAccount):
     __MINIMUM = 10_000
     __accounts = []
 
@@ -98,8 +94,8 @@ class PasargadAccount(BankAccount):
             logger.error("Raised")
             raise ValueError("Invalid cvv2")
 
-        self.balance -= (amount - 600)
-        other.balance += amount
+        self.balance -= amount
+        other.balance = other.balance + amount
         logger.info("successfully transferred")
 
     @classmethod
@@ -112,17 +108,17 @@ class PasargadAccount(BankAccount):
             {
                 "owner_name": account.owner_name,
                 "balance": account.balance,
-                "password": account._password_hash,
+                "password": account._password,
                 "cvv2": account._cvv2,
             }
             for account in cls.__accounts
         ]
-        with open("account.json", "w", encoding="utf_8") as file:
-            json.dump(data, file , indent=4)
+        with open("account_pasargard.json", "w", encoding="utf_8") as file:
+            json.dump(data, file, indent=4)
 
     @classmethod
     def load(cls):
-        with open("account.json", "r", encoding="utf_8") as file:
+        with open("account_pasargard.json", "r", encoding="utf_8") as file:
             data = json.load(file)
             cls.__accounts = [
                 cls(
@@ -133,6 +129,7 @@ class PasargadAccount(BankAccount):
                 )
                 for account_data in data
             ]
+
 
 class ShahrBankAccount(BankAccount):
     __MINIMUM = 10_000
@@ -166,9 +163,9 @@ class ShahrBankAccount(BankAccount):
         if not self.verify_cvv2(cvv2):
             logger.error("Raised")
             raise ValueError("Invalid cvv2")
-
-        self.balance -= (amount - 600)
-        other.balance += amount
+        
+        self.balance -= amount
+        other.balance = other.balance + amount
         logger.info("successfully transferred")
 
     @classmethod
@@ -181,17 +178,17 @@ class ShahrBankAccount(BankAccount):
             {
                 "owner_name": account.owner_name,
                 "balance": account.balance,
-                "password": account._password_hash,
+                "password": account._password,
                 "cvv2": account._cvv2,
             }
             for account in cls.__accounts
         ]
-        with open("account.json", "w", encoding="utf_8") as file:
-            json.dump(data, file , indent=4)
+        with open("account_shahr.json", "w", encoding="utf_8") as file:
+            json.dump(data, file, indent=4)
 
     @classmethod
     def load(cls):
-        with open("account.json", "r", encoding="utf_8") as file:
+        with open("account_shahr.json", "r", encoding="utf_8") as file:
             data = json.load(file)
             cls.__accounts = [
                 cls(
@@ -202,4 +199,3 @@ class ShahrBankAccount(BankAccount):
                 )
                 for account_data in data
             ]
-
