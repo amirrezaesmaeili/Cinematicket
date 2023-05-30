@@ -167,7 +167,8 @@ def main():
                                 sans_list = Cinema.get_all_sans()
                                 film_name = input("Enter The Film Name For Reserving: ")
                                 film_play_time = input("Enter The Film Playing Time: ")
-
+                                for sans in sans_list:
+                                    print(sans["ticket_price"])
                                 for sans in sans_list:
                                     if sans['film_name'] == film_name and sans['film_play_time'] == film_play_time:
                                         capacity = int(input("Enter the number of seats to reserve: "))
