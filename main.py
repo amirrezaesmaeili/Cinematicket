@@ -90,7 +90,7 @@ def main():
                 telephone_number = input("Enter Your Telephone Number In +98 Format: \n")
                 pattern = regex.compile(r"^\+98\d{10}$")
                 if not pattern.match(telephone_number):
-                    print("Phone number is invalid.")
+                    raise ValueError("Phone number is invalid.")
                 message_create_user = User.create_user(username, password, telephone_number)
                 print(message_create_user)
                 
@@ -132,8 +132,8 @@ def main():
                             elif user_edit_choice == "2":
                                 new_telephone_number = input("Enter Your New Telephone Number In +98 Format: ")
                                 pattern = regex.compile(r"^\+98\d{10}$")
-                                if not pattern.match(telephone_number):
-                                    print("Phone number is invalid.")
+                                if not pattern.match(new_telephone_number):
+                                    raise ValueError("Phone number is invalid.")
                                 message_update_telephonenumber = user.update_telephone_number(new_telephone_number)
                                 print(message_update_telephonenumber)
                             else:            
