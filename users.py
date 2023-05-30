@@ -26,7 +26,7 @@ class UserRole(Enum):
 class User:
     users = {}
 
-    def __init__(self, username: str, password: str,date_of_birth: str, telephone_number= None,role=UserRole.USER) -> None:
+    def __init__(self, username: str, password: str,date_of_birth: datetime.date, telephone_number= None,role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -317,4 +317,12 @@ class User:
         else:
             os.system("clear") 
          
-    
+    def is_birthday(self) -> bool:
+        """
+        Check if it's the user's birthday today.
+        """
+        today = datetime.date.today()
+        return today.month == self.date_of_birth.month and today.day == self.date_of_birth.day
+
+                    
+
