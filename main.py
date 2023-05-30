@@ -105,7 +105,8 @@ def main():
                         print("2: Edit user information")
                         print("3: Change password")
                         print("4: cinema screenings")
-                        print("5: Logout")
+                        print("5: Bank Account")
+                        print("6: Logout")
                         user_login_choice = input("Enter your choice: ")
                         
                         if  user_login_choice == "1":
@@ -180,10 +181,10 @@ def main():
                                 else:
                                     print("\n>>>> Sans not found. <<<<\n")
 
-                                
-                                    
-                                            
                         elif user_login_choice == "5":
+                            pass
+                   
+                        elif user_login_choice == "6":
                             break
                         
                         else:
