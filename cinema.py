@@ -1,4 +1,5 @@
 import json
+import datetime
 
 class Cinema:
     id_counter = 0
