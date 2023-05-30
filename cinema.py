@@ -66,6 +66,6 @@ class Cinema:
             raise MyException("Session time has passed.")
         if capacity is not None and capacity <= 0:
             raise MyException("Theater capacity is full.")
-        if self.film_age_category > user_age_category:
+        if self.film_age_category > User.user_age():
             raise MyException("You are not allowed to reserve or watch this film.")
         return True
