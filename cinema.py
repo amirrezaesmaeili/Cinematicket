@@ -1,4 +1,17 @@
 import json
+import datetime
+from users import User
+import logging
+
+logger = logging.getLogger("CinemaLogger")
+logger.setLevel(level=logging.INFO)
+file_handler = logging.FileHandler("cinematicket.log")
+pattern = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(pattern)
+logger.addHandler(file_handler)
+
+class MyException(Exception):
+    pass
 
 class Cinema:
     id_counter = 0
@@ -37,14 +50,31 @@ class Cinema:
     @classmethod
     def create_sans(cls,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int):
         try:
-            cls.load_sans_from_file()
-            if film_name in cls.sans:
-                raise ValueError("This Film already exists.")
-            else:
                 cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity)
                 cinema_sans.save_sans_to_file()
-                return f"\n>>>>  Sans for {film_name} in {film_play_time} created successfully. <<<<\n"
+                logger.info(f"Sans created successfully.")
+                return f"\n>>>>  Sans created successfully. <<<<\n"
         except ValueError as Err:
+            logger.error(Err)
             return str(Err)
 
-                
+    @classmethod
+    def get_all_sans(cls):
+        cls.load_sans_from_file()
+        return list(cls.sans.values())            
+
+    def can_reserve_sans(self, film_play_time: str, capacity: int) -> bool:
+        """
+        Check if the user can reserve a session.
+        """
+        film_play_time = datetime.datetime.strptime(film_play_time, "%H:%M").time()
+        film_formatted_time = film_play_time.strftime("%H:%M")
+        current_time = datetime.datetime.now()
+        current_formatted_time = current_time.strftime("%H:%M")
+        if film_formatted_time < current_formatted_time:
+            raise MyException("Session time has passed.")
+        if capacity is not None and capacity <= 0:
+            raise MyException("Theater capacity is full.")
+        if self.film_age_category > User.user_age():
+            raise MyException("You are not allowed to reserve or watch this film.")
+        return True
