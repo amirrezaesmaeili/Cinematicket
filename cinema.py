@@ -43,10 +43,12 @@ class Cinema:
     @classmethod
     def create_sans(cls,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int):
         try:
-            cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity)
-            cinema_sans.save_sans_to_file()
-            return "\n>>>>  Sans created successfully. <<<<\n"
+                cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity)
+                cinema_sans.save_sans_to_file()
+                logger.info(f"Sans created successfully.")
+                return f"\n>>>>  Sans created successfully. <<<<\n"
         except ValueError as Err:
+            logger.error(Err)
             return str(Err)
 
     @classmethod
