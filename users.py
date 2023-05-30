@@ -26,7 +26,7 @@ class UserRole(Enum):
 class User:
     users = {}
 
-    def __init__(self, username: str, password: str,date_of_birth: datetime.date, telephone_number= None,role=UserRole.USER) -> None:
+    def __init__(self, username: str, password: str,date_of_birth: datetime.date,membership_months: int, telephone_number= None,role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -38,6 +38,7 @@ class User:
         self.username = username
         self._password = password
         self.date_of_birth = date_of_birth
+        self.membership_months = membership_months
         self.telephone_number = telephone_number
         self.role = role
         self.id = str(uuid.uuid4())
@@ -324,5 +325,17 @@ class User:
         today = datetime.date.today()
         return today.month == self.date_of_birth.month and today.day == self.date_of_birth.day
 
-                    
 
+    def discount_apply(self, original_price: float) -> float:
+        """
+        Apply a discount to the original price.
+        """
+        if self.is_birthday():
+            final_price = original_price * 0.5
+        else:
+            discount_percentage = self.membership_months * 0.1
+            discount_amount = original_price * discount_percentage
+            final_price = original_price - discount_amount
+        return final_price         
+ 
+                        
