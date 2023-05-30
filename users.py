@@ -26,7 +26,7 @@ class UserRole(Enum):
 class User:
     users = {}
 
-    def __init__(self, username: str, password: str,date_of_birth: str, telephone_number= None,role=UserRole.USER) -> None:
+    def __init__(self, username: str, password: str,date_of_birth: datetime.date, telephone_number= None,role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -316,5 +316,4 @@ class User:
             os.system("cls")    
         else:
             os.system("clear") 
-         
     
