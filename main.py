@@ -58,7 +58,8 @@ def main():
                     film_play_time = input("Enter Film Playing Time In 00:00 Format: \n")
                     film_age_category = input("Enter Age Category Of The Film: \n")
                     capacity = input("Enter The Cinema Capacity: \n")
-                    message_create_sans = Cinema.create_sans(film_name,film_genre,film_play_time,film_age_category,capacity)
+                    ticket_price = input("Enter The Ticket Price: \n")
+                    message_create_sans = Cinema.create_sans(film_name,film_genre,film_play_time,film_age_category,capacity,ticket_price)
                     print(message_create_sans)
                 
                 elif manager_choice == "3":
