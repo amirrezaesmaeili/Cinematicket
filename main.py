@@ -2,6 +2,7 @@ from users import User
 from cinema import Cinema
 import getpass
 import argparse
+import datetime
 
 def main():
     User.clear_screen()          
@@ -154,7 +155,32 @@ def main():
                                     print(f"Capacity: {sans['capacity']}")
                                     print("---------------------------")
                             elif user_cinema_choice == "2":
-                                pass
+                                sans_list = Cinema.get_all_sans()
+                                film_name = input("Enter The Film Name For Reserving: ")
+                                film_play_time = input("Enter The Film Playing Time: ")
+
+                                for sans in sans_list:
+                                    if sans['film_name'] == film_name and sans['film_play_time'] == film_play_time:
+                                        capacity = int(input("Enter the number of seats to reserve: "))
+                                        try:
+                                            cinema_sans = Cinema(sans['film_name'], sans['film_genre'], sans['film_play_time'], sans['film_age_category'], sans['capacity'])
+                                            can_reserve = cinema_sans.can_reserve_sans(film_play_time, capacity)
+                                            if can_reserve:
+                                                cinema_sans.capacity = int(cinema_sans.capacity)
+                                                capacity = int(capacity)
+                                                if capacity <= cinema_sans.capacity:
+                                                    cinema_sans.capacity -= capacity
+                                                    cinema_sans.save_sans_to_file()
+                                                    print(f"\n>>>> Seats reserved successfully. Remaining capacity: {cinema_sans.capacity} <<<<\n")
+                                                else:
+                                                    print("\n>>>> Insufficient capacity. <<<<\n")
+                                        except ValueError as e:
+                                            print(str(e))
+                                        break
+                                else:
+                                    print("\n>>>> Sans not found. <<<<\n")
+
+                                
                                     
                                             
                         elif user_login_choice == "5":
@@ -177,4 +203,4 @@ def main():
         
 if __name__ == "__main__":
     main()
-    
+   
