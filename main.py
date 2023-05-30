@@ -89,9 +89,7 @@ def main():
                 password = getpass.getpass("Enter a password (at least 4 characters): \n")
                 telephone_number = input("Enter Your Telephone Number In +98 Format: \n")
                 pattern = regex.compile(r"^\+98\d{10}$")
-                if pattern.match(telephone_number):
-                    print("Phone number is valid.")
-                else:
+                if not pattern.match(telephone_number):
                     print("Phone number is invalid.")
                 message_create_user = User.create_user(username, password, telephone_number)
                 print(message_create_user)
