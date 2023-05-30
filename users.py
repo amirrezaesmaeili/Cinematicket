@@ -5,6 +5,7 @@ from enum import Enum
 import os
 import platform
 import logging
+import datetime
 
 logger = logging.getLogger("UserLogger")
 logger.setLevel(level=logging.INFO)
@@ -12,6 +13,10 @@ file_handler = logging.FileHandler("cinematicket.log")
 pattern = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
 file_handler.setFormatter(pattern)
 logger.addHandler(file_handler)
+
+
+class MyException(Exception):
+    pass
 
 class UserRole(Enum):
     MANAGER = "manager"
@@ -37,6 +42,9 @@ class User:
         self.telephone_number = telephone_number
         self.id = id
         self.role = role
+        self.id = str(uuid.uuid4())
+        self.registration_date = datetime.datetime.now()
+
 
     def __str__(self) -> str:
         """
@@ -251,6 +259,11 @@ class User:
             logger.error(Err)
             return str(Err)
 
+    def user_age(self):
+        today = datetime.datetime.today()
+        user_birth = datetime.datetime.strptime(self.date_of_birth, '%Y-%m-%d')
+        return (today - user_birth).days // 365
+    
     @staticmethod
     def validate_newpass(pass1: str, pass2: str) -> str:
         """
@@ -314,11 +327,4 @@ class User:
     def clear_screen():
         if platform.system() == "Windows":
             os.system("cls")    
-        else:
-            os.system("clear")      
-
-
-
-#user = User.create_user("mah", "aban")
-# print(type(user.role))
-# print(user.role.value)
+     
