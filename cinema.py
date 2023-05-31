@@ -21,7 +21,7 @@ class Cinema:
         self.id = Cinema.id_counter
         self.film_name = film_name
         self.film_genre = film_genre
-        self.film_paly_time = film_play_time
+        self.film_play_time = film_play_time
         self.film_age_category = film_age_category
         self.capacity = capacity
         

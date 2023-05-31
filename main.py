@@ -122,7 +122,6 @@ def main():
                 password = User.build_pass(getpass.getpass("Enter your password: \n"))
                 User.load_from_database()
                 if username in User._users and User._users[username]["password"] == password:
-                    user = User(username, User._users[username]["password"], User._users[username]["telephone_number"])
                     logger.info("while True/ elif choice 2/ elif user_choice 2/ if username;  user logged in.")
                     while True:
                         print("User menu:")
