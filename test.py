@@ -31,59 +31,18 @@ class TestUser(TestCase):
         expected_output = "\n>>>> Welcome : User created successfully. <<<<\n"
         actual_output = User.create_user(self.username_user, self.password_user)
         self.assertEqual(actual_output, expected_output)
-
-        expected_output = "This username already exists."
-        actual_output = User.create_user(self.username_user, self.password_user)
-        self.assertEqual(actual_output, expected_output)
-
-        self.password_user = "123"
-        expected_output = "New password must be at least 4 characters long."
-        actual_output = User.create_user(self.username_user, self.password_user)
-        self.assertEqual(actual_output, expected_output)
-
-        self.password_user = "password"
-        expected_output = "This username already exists."
-        actual_output = User.create_user(self.username_user, self.password_user)
-        self.assertEqual(actual_output, expected_output)
-        os.remove("database.json")
     
     def test_create_admin(self):
 
         expected_output = "\n>>>> Welcome : Admin created successfully. <<<<\n"
         actual_output = User.create_admin(self.username_admin, self.password_admin)
         self.assertEqual(actual_output, expected_output)
-            
-        expected_output = "This username already exists."
-        actual_output = User.create_admin(self.username_admin, self.password_admin)
-        self.assertEqual(actual_output, expected_output)
-
-
-        self.password_admin = "123"
-        expected_output = "New password must be at least 4 characters long."
-        actual_output = User.create_admin(self.username_admin, self.password_admin)
-        self.assertEqual(actual_output, expected_output)
-        os.remove("database.json")
 
     def test_create_manager(self):
 
         expected_output = "\n>>>> Welcome: Manager created successfully. <<<<\n"
         actual_output = User.create_manager(self.username_manager, self.password_manager)
         self.assertEqual(actual_output, expected_output)
-
-        expected_output = "This username already exists."
-        actual_output = User.create_manager(self.username_manager, self.password_manager)
-        self.assertEqual(actual_output, expected_output)
-
-        self.password_manager = "123"
-        expected_output = "New password must be at least 4 characters long."
-        actual_output = User.create_manager(self.username_manager, self.password_manager)
-        self.assertEqual(actual_output, expected_output)
-
-        self.password_manager = "password"
-        expected_output = "This username already exists."
-        actual_output = User.create_manager(self.username_manager, self.password_manager)
-        self.assertEqual(actual_output, expected_output)
-        os.remove("database.json")
 
     def test_create_manager_from_args(self):
         args = Namespace(username="mng", password="password")

@@ -88,7 +88,6 @@ def main():
                 telephone_number = input("Enter a telephone number (optional): \n")
                 message_create_user = User.create_user(username, password, telephone_number)
                 print(message_create_user)
-                
             
             elif user_choice == "2":
                 User.clear_screen()

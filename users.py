@@ -1,9 +1,10 @@
-import uuid
+from uuid import uuid4
 import hashlib
 import json
 from enum import Enum
 import os
 import platform
+import datetime as dt
 
 class UserRole(Enum):
     MANAGER = "manager"
@@ -24,15 +25,18 @@ class User:
         """
         self.username = username
         self._password = password
+        self.birth = birth
+        self.submit_date = dt.date.today()
         self.telephone_number = telephone_number
-        self.id = str(uuid.uuid4())
+        self.id = id
         self.role = role
 
     def __str__(self) -> str:
         """
         Return a string representation of the User object.
         """
-        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}"
+        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}\
+            Birthday: {self.birth}\nSubmit_date: {self.submit_date}"
 
     def age_counter(self) -> int:
         """
@@ -41,7 +45,6 @@ class User:
         today = dt.datetime.today()
         user_birth = dt.datetime.strptime(self.birth, '%Y-%m-%d')
         user_age = (today - user_birth).days // 365
-        logger.info(f"user age is {user_age}.")
         return user_age
 
     def calculate_membership(self) -> int:
@@ -50,31 +53,26 @@ class User:
         """
         today = dt.date.today()
         membership = (today - self.submit_date).days // 30
-        logger.info(f"user's membership is {membership}")
         return membership
 
     @classmethod
     def sign_up(cls, username: str, password: str, role: str, birth: str, telephone_number=None):
         cls.load_from_database()
         if username in cls._users:
-            logger.error("This username already exists.")
             raise ValueError("This username already exists.")
         else:
             validate = cls.validate_password(password)
             if validate:
                 if role == "USER":
                     if birth:
-                        logger.info("Creating User")
                         cls.create_user(username, password, birth, telephone_number,role=UserRole.USER)
                         return "Creating User"
                     else:
                         raise ValueError("Birthday field is required!")
                 elif role == "ADMIN":
-                    logger.info("Creating Admin")
                     cls.create_admin(username, password,role=UserRole.ADMIN)
                     return "Creating Admin"
                 elif role == "MANAGER":
-                    logger.info("Creating Manager")
                     cls.create_manager(username, password, role=UserRole.MANAGER)
                     return "Creating Manager"
             else:
@@ -102,18 +100,11 @@ class User:
             telephone_number: The telephone number for the new user. Defaults to None.
         """
         try:
-            cls.load_from_database()
-            validate = cls.validate_password(password)
-
-            if username in cls.users:
-                raise ValueError("This username already exists.")
-            elif validate is not None:
-                raise ValueError(validate)
-            else:
-                password = cls.build_pass(password)
-                user = cls(username, password, telephone_number,role=UserRole.USER)
-                user.save_to_database()
-                return "\n>>>> Welcome : User created successfully. <<<<\n"
+            password = cls.build_pass(password)
+            id = str(uuid4())
+            user = cls(username, password, birth, id, submit_date, telephone_number,role=UserRole.USER)
+            user.save_to_database()
+            return "\n>>>> Welcome : User created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
         
@@ -128,36 +119,20 @@ class User:
             telephone_number: The telephone number for the new user. Defaults to None.
         """
         try:
-            cls.load_from_database()
-            validate = cls.validate_password(password)
-
-            if username in cls.users:
-                raise ValueError("This username already exists.")
-            elif validate is not None:
-                raise ValueError(validate)
-            else:
-                password = cls.build_pass(password)
-                user = cls(username, password,role=UserRole.ADMIN)
-                user.save_to_database()
-                return "\n>>>> Welcome : Admin created successfully. <<<<\n"
+            password = cls.build_pass(password)
+            user = cls(username, password,role=UserRole.ADMIN)
+            user.save_to_database()
+            return "\n>>>> Welcome : Admin created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
         
     @classmethod
     def create_manager(cls, username: str, password: str,role=UserRole.MANAGER) -> str:
         try:
-            cls.load_from_database()
-            validate = cls.validate_password(password)
-
-            if username in cls.users:
-                raise ValueError("This username already exists.")
-            elif validate is not None:
-                raise ValueError(validate)
-            else:
-                password = cls.build_pass(password)
-                user = cls(username, password, role=UserRole.MANAGER)
-                user.save_to_database()
-                return "\n>>>> Welcome: Manager created successfully. <<<<\n"
+            password = cls.build_pass(password)
+            user = cls(username, password, role=UserRole.MANAGER)
+            user.save_to_database()
+            return "\n>>>> Welcome: Manager created successfully. <<<<\n"
         except ValueError as Err:
             return str(Err)
     
@@ -165,9 +140,11 @@ class User:
     def create_manager_from_args(cls, args):
         username = args.username
         password = args.password
+        role = "MANAGER"
+        cls.sign_up(username, password, role)
 
-        message_create_user = cls.create_manager(username, password, UserRole.MANAGER)
-        print(message_create_user)
+        # message_create_user = cls.create_manager(username, password, UserRole.MANAGER)
+        # print(message_create_user)
 
     @classmethod
     def get_manager_details(cls):
@@ -284,6 +261,8 @@ class User:
                 "id": self.id,
                 "username": self.username,
                 "password": self._password,
+                "birthday": self.birth,
+                "submit_date": self.submit_date,
                 "telephone_number": self.telephone_number,
                 "role": self.role.value,
             }
