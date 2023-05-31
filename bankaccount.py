@@ -28,41 +28,52 @@ class BankAccount(ABC):
 
     @property
     def balance(self):
+        logger.info("BankAccount/ balance; Getter")
         return self._balance
 
     @balance.setter
     def balance(self, balance: int):
         if balance < 10_000:
+            logger.info("BankAccount/ balance; raised error: Invalid balance")
             raise ValueError("Invalid balance")
-
+        
         self._balance = balance
+        logger.info("BankAccount/ balance; balance set")
 
     def __repr__(self) -> str:
         dictionary = vars(self)
         dictionary["rial"] = self.to_rial(self._balance)
+        logger.info("BankAccount/ __repr__; dictionary made.")
         return str(dictionary)
 
     def __str__(self) -> str:
+        logger.info("BankAccount/ __str__;  showing owner info.")
         return f"{self.owner_name}: {self._balance:,}"
 
     def __add__(self, amount: int):
+        logger.info(f"BankAccount/ __add__;  {amount} added to account.")
         return self._balance + amount
 
     def __sub__(self, amount: int):
+        logger.info(f"BankAccount/ __sub__;  {amount} subtracted from account.")
         return self._balance - amount
 
     def _hash_password(self, password: str) -> str:
+        logger.info("BankAccount/ _hash_password;  hashed pass created.")
         return sha256(password.encode()).hexdigest()
 
     def verify_password(self, password: str) -> bool:
         hashed_password = self._hash_password(password)
+        logger.info("BankAccount/ verify_password;  password verified.")
         return self._password_hash == hashed_password
 
     def verify_cvv2(self, cvv2: str) -> bool:
+        logger.info("BankAccount/ verify_cvv2;  cvv2 verified.")
         return self._cvv2 == cvv2
 
     @staticmethod
     def to_rial(balance):
+        logger.info("BankAccount/ to_rial;  balance came to rial.")
         return balance * 10
 
 class PasargadAccount(BankAccount):
@@ -75,35 +86,38 @@ class PasargadAccount(BankAccount):
 
     def __add__(self, amount: int):
         if self._balance + amount < self.__MINIMUM:
+            logger.error(f"PasargadAccount/ __add__;  raised error: Invalid balance.")
             raise ValueError("Invalid balance")
-
+        logger.info(f"PasargadAccount/ __add__;  {amount} added to balance.")
         return super().__add__(amount)
 
     def __sub__(self, amount: int):
         if self._balance - amount < self.__MINIMUM:
+            logger.error(f"PasargadAccount/ __sub__;  raised error: Invalid balance")
             raise ValueError("Invalid balance")
-
+        logger.info(f"PasargadAccount/ __sub__;  {amount} subtracted from balance.")
         return super().__sub__(amount)
 
     def transfer(self, other: "BankAccount", amount: int, password: str, cvv2: str):
         if amount < 0:
-            logger.error("Raised")
+            logger.error("PasargadAccount/ transfer;  raised error: Invalid amount")
             raise ValueError("Invalid amount")
 
         if not self.verify_password(password):
-            logger.error("Raised")
+            logger.error("PasargadAccount/ transfer;  raised error: Invalid password")
             raise ValueError("Invalid password")
 
         if not self.verify_cvv2(cvv2):
-            logger.error("Raised")
+            logger.error("PasargadAccount/ transfer;  raised error: Invalid cvv2")
             raise ValueError("Invalid cvv2")
 
         self.balance -= (amount - 600)
         other.balance += amount
-        logger.info("successfully transferred")
+        logger.info(f"PasargadAccount/ transfer;  {amount} subtracted from {self.owner_name} and added to {other}.")
 
     @classmethod
     def maximum(cls) -> int:
+        logger.info("PasargadAccount/ maximum;  find maximum balance between accounts.")
         return max([account.balance for account in cls.__accounts])
 
     @classmethod
@@ -119,11 +133,13 @@ class PasargadAccount(BankAccount):
         ]
         with open("account.json", "w", encoding="utf_8") as file:
             json.dump(data, file , indent=4)
+            logger.info("PasargadAccount/ save;  data saved to the file.")
 
     @classmethod
     def load(cls):
         with open("account.json", "r", encoding="utf_8") as file:
             data = json.load(file)
+            logger.info("PasargadAccount/ load;  data loaded from file.")
             cls.__accounts = [
                 cls(
                     owner_name=account_data["owner_name"],
@@ -144,35 +160,38 @@ class ShahrBankAccount(BankAccount):
 
     def __add__(self, amount: int):
         if self._balance + amount < self.__MINIMUM:
+            logger.error(f"ShahrBankAccount/ __add__;  raised error: Invalid balance.")
             raise ValueError("Invalid balance")
-
+        logger.info(f"ShahrBankAccount/ __add__;  {amount} added to balance.")
         return super().__add__(amount)
 
     def __sub__(self, amount: int):
         if self._balance - amount < self.__MINIMUM:
+            logger.error(f"ShahrBankAccount/ __sub__;  raised error: Invalid balance.")
             raise ValueError("Invalid balance")
-
+        logger.info(f"ShahrBankAccount/ __sub__;  {amount} subtracted from balance.")
         return super().__sub__(amount)
 
     def transfer(self, other: "BankAccount", amount: int, password: str, cvv2: str):
         if amount < 0:
-            logger.error("Raised")
+            logger.error(f"ShahrBankAccount/ transfer;  raised error: Invalid amount.")
             raise ValueError("Invalid amount")
 
         if not self.verify_password(password):
-            logger.error("Raised")
+            logger.error(f"ShahrBankAccount/ transfer;  raised error: Invalid password.")
             raise ValueError("Invalid password")
 
         if not self.verify_cvv2(cvv2):
-            logger.error("Raised")
+            logger.error(f"ShahrBankAccount/ transfer;  raised error: Invalid cvv2.")
             raise ValueError("Invalid cvv2")
 
         self.balance -= (amount - 600)
         other.balance += amount
-        logger.info("successfully transferred")
+        logger.info(f"ShahrBankAccount/ transfer;  {amount} subtracted from {self.owner_name} and added to {other}")
 
     @classmethod
     def maximum(cls) -> int:
+        logger.info("ShahrBankAccount/ maximum;  find maximum balance between accounts.")
         return max([account.balance for account in cls.__accounts])
 
     @classmethod
@@ -188,11 +207,13 @@ class ShahrBankAccount(BankAccount):
         ]
         with open("account.json", "w", encoding="utf_8") as file:
             json.dump(data, file , indent=4)
+            logger.info("ShahrBankAccount/ save;  data saved to the file.")
 
     @classmethod
     def load(cls):
         with open("account.json", "r", encoding="utf_8") as file:
             data = json.load(file)
+            logger.info("ShahrBankAccount/ load;  data loaded from file.")
             cls.__accounts = [
                 cls(
                     owner_name=account_data["owner_name"],

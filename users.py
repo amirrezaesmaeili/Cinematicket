@@ -1,11 +1,11 @@
-import uuid
+from uuid import uuid4
 import hashlib
 import json
 from enum import Enum
 import os
 import platform
 import logging
-import datetime
+import datetime as dt
 
 logger = logging.getLogger("UserLogger")
 logger.setLevel(level=logging.INFO)
@@ -24,9 +24,9 @@ class UserRole(Enum):
     USER = "user"
 
 class User:
-    users = {}
+    _users = {}
 
-    def __init__(self, username: str, password: str,date_of_birth: datetime.date, telephone_number= None,role=UserRole.USER) -> None:
+    def __init__(self, username: str, password: str, birth: str, id: str, submit_date: str, telephone_number= None,role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -37,18 +37,67 @@ class User:
         """
         self.username = username
         self._password = password
-        self.date_of_birth = date_of_birth
+        self.birth = birth
+        self.submit_date = submit_date
         self.telephone_number = telephone_number
+        self.id = id
         self.role = role
-        self.id = str(uuid.uuid4())
-        self.registration_date = datetime.datetime.now()
-
 
     def __str__(self) -> str:
         """
         Return a string representation of the User object.
         """
-        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}"
+        logger.info("__str__;  showing user's info to user.")
+        return f"ID: {self.id}\nUsername: {self.username}\nTelephone Number: {self.telephone_number}\
+            Birthday: {self.birth}\nSubmit_date: {self.submit_date}"
+
+    def age_counter(self) -> int:
+        """
+        calculate and return user age.
+        """
+        today = dt.datetime.today()
+        user_birth = dt.datetime.strptime(self.birth, '%Y-%m-%d')
+        user_age = (today - user_birth).days // 365
+        logger.info("age counter;  user's age calculated.")
+        return user_age
+
+    def calculate_membership(self) -> int:
+        """
+        calculate and return user membership time.
+        """
+        today = dt.date.today()
+        membership = (today - self.submit_date).days // 30
+        logger.info("calculate membership;  user's membership calculated.")
+        return membership
+
+    @classmethod
+    def sign_up(cls, username: str, password: str, role: str, birth: str, telephone_number=None):
+        cls.load_from_database()
+        if username in cls._users:
+            logger.error("sign_up/ if username;  raised error: This username already exists.")
+            raise ValueError("This username already exists.")
+        else:
+            validate = cls.validate_password(password)
+            if validate:
+                if role == "USER":
+                    if birth:
+                        cls.create_user(username, password, birth, telephone_number,role=UserRole.USER)
+                        logger.info("sign_up/ if birth;  return message: Creating User")
+                        return "Creating User"
+                    else:
+                        logger.error("sign_up/ 2nd else;  raised error: Birthday field is required!")
+                        raise ValueError("Birthday field is required!")
+                elif role == "ADMIN":
+                    cls.create_admin(username, password,role=UserRole.ADMIN)
+                    logger.info("sign_up/ elif ADMIN;  return message: Creating Admin")
+                    return "Creating Admin"
+                elif role == "MANAGER":
+                    cls.create_manager(username, password, role=UserRole.MANAGER)
+                    logger.info("sign_up/ elif MANAGER;  return message: Creating MANAGER")
+                    return "Creating Manager"
+            else:
+                logger.error("sign_up/ last else;  raised error: Password must be at least 4 characters long.")
+                raise ValueError("Password must be at least 4 characters long.")
 
     @staticmethod
     def build_pass(password: str) -> str:
@@ -59,10 +108,11 @@ class User:
             password: The password to hashed.
         """
         p_hash = hashlib.sha256(password.encode())
+        logger.info("buid_pass;  hashed pass created.")
         return p_hash.hexdigest()
 
     @classmethod
-    def create_user(cls, username: str, password: str, telephone_number: str = None,role=UserRole.USER) -> str:
+    def create_user(cls, username: str, password: str, birth: str, telephone_number: str = None,role=UserRole.USER) -> str:
         """
         Create a new user and save it to the database.
 
@@ -72,21 +122,15 @@ class User:
             telephone_number: The telephone number for the new user. Defaults to None.
         """
         try:
-            cls.load_from_database()
-            validate = cls.validate_password(password)
-
-            if username in cls.users:
-                logger.error("This username already exists.")
-                raise ValueError("This username already exists.")
-            elif validate is not None:
-                raise ValueError(validate)
-            else:
-                password = cls.build_pass(password)
-                user = cls(username, password, telephone_number,role=UserRole.USER)
-                user.save_to_database()
-                logger.info("Welcome : User created successfully.")
-                return "\n>>>> Welcome : User created successfully. <<<<\n"
+            password = cls.build_pass(password)
+            id = str(uuid4())
+            submit_date = str(dt.date.today())
+            user = cls(username, password, birth, id, submit_date, telephone_number,role=UserRole.USER)
+            user.save_to_database()
+            logger.info("create_user;  return message: Welcome : User created successfully.")
+            return "\n>>>> Welcome : User created successfully. <<<<\n"
         except ValueError as Err:
+            logger.error("create_user/ except;  raised value error.")
             return str(Err)
         
     @classmethod
@@ -100,66 +144,57 @@ class User:
             telephone_number: The telephone number for the new user. Defaults to None.
         """
         try:
-            cls.load_from_database()
-            validate = cls.validate_password(password)
-
-            if username in cls.users:
-                logger.error("This username already exists.")
-                raise ValueError("This username already exists.")
-            elif validate is not None:
-                raise ValueError(validate)
-            else:
-                password = cls.build_pass(password)
-                user = cls(username, password,role=UserRole.ADMIN)
-                user.save_to_database()
-                logger.info("Welcome : Admin created successfully.")
-                return "\n>>>> Welcome : Admin created successfully. <<<<\n"
+            password = cls.build_pass(password)
+            birth = ""
+            id = str(uuid4())
+            submit_date = ""
+            user = cls(username, password, birth, id, submit_date, role=UserRole.ADMIN)
+            user.save_to_database()
+            logger.info("create_admin;  return message: Welcome : Admin created successfully.")
+            return "\n>>>> Welcome : Admin created successfully. <<<<\n"
         except ValueError as Err:
+            logger.error("create_admin/ except;  raised value error.")
             return str(Err)
         
     @classmethod
     def create_manager(cls, username: str, password: str,role=UserRole.MANAGER) -> str:
         try:
-            cls.load_from_database()
-            validate = cls.validate_password(password)
-
-            if username in cls.users:
-                logger.error("This username already exists.")
-                raise ValueError("This username already exists.")
-            elif validate is not None:
-                raise ValueError(validate)
-            else:
-                password = cls.build_pass(password)
-                user = cls(username, password, role=UserRole.MANAGER)
-                user.save_to_database()
-                logger.info("Welcome : Manager created successfully.")
-                return "\n>>>> Welcome: Manager created successfully. <<<<\n"
+            password = cls.build_pass(password)
+            birth = ""
+            id = str(uuid4())
+            submit_date = ""
+            user = cls(username, password, birth, id, submit_date, role=UserRole.MANAGER)
+            user.save_to_database()
+            logger.info("create_manager;  return message: Welcome : Manager created successfully.")
+            return "\n>>>> Welcome: Manager created successfully. <<<<\n"
         except ValueError as Err:
+            logger.error("create_manager/ except;  raised value error.")
             return str(Err)
     
     @classmethod
     def create_manager_from_args(cls, args):
         username = args.username
         password = args.password
-
-        message_create_user = cls.create_manager(username, password, UserRole.MANAGER)
-        print(message_create_user)
+        role = "MANAGER"
+        birth = ""
+        cls.sign_up(username, password, role, birth)
+        logger.info("create_manager_from_args;  called signup function")
 
     @classmethod
     def get_manager_details(cls):
         manager_username = None
-        for username, user_info in cls.users.items():
+        for username, user_info in cls._users.items():
             if user_info["role"] == UserRole.MANAGER.value:
                 manager_username = username
                 break
 
-        if manager_username is not None:
-            logger.info("<---------Manager Details--------->")
+        if manager_username:
+            logger.info("get_manager_details;  <---------Manager Details--------->")
             logger.info(f"Manager Username: {manager_username}")
             print("<---------Manager Details--------->")
             print(f"Manager Username: {manager_username}\n")
         else:
-            logger.warning("No manager user found.")
+            logger.warning("get_manager_details;  warning message: No manager user found.")
             print("No manager user found.")
 
     def update_username(self, new_username: str) -> str:
@@ -173,21 +208,22 @@ class User:
             message: the username was updated successfully.
         """
         try:
-            if self.username in User.users:
-                if new_username in User.users:
-                    logger.error("This username already exists.")
+            if self.username in User._users:
+                if new_username in User._users:
+                    logger.error("update_username/ if new_username;  raised error: This username already exists.")
                     raise ValueError("This username already exists.")
                 else:
-                    User.users.pop(self.username)
+                    User._users.pop(self.username)
                     self.username = new_username
-                    User.users[new_username] = self
+                    User._users[new_username] = self
                     self.save_to_database()
-                    logger.info("Username updated successfully.")
+                    logger.info("update_username/ 1st else;  return message: Username updated successfully.")
                     return "\n>>>> Username updated successfully. <<<<\n"
             else:
-                logger.error("The user does not exist.")
+                logger.error("update_username/ 2nd else;  raised error: The user does not exist.")
                 raise ValueError("The user does not exist.")
         except ValueError as err:
+            logger.error("update_username/ except;  raised value error.")
             return str(err)
 
     def update_telephone_number(self, new_telephone_number: str) -> str:
@@ -203,9 +239,10 @@ class User:
         try:
                 self.telephone_number = new_telephone_number
                 self.save_to_database()
-                logger.info("Telephone number updated successfully.")
+                logger.info("update_telephone_number/ try: return message: Telephone number updated successfully.")
                 return "\n>>>> Telephone number updated successfully. <<<<\n"
         except ValueError as Err:
+            logger.error("update_telephone_number/ except;  raised value error.")
             return str(Err)
 
     def update_password(self, old_password: str, new_password1: str, new_password2: str) -> str:
@@ -223,36 +260,31 @@ class User:
         try:
             new_pass = self.validate_newpass(new_password1, new_password2)
             old_password = self.build_pass(old_password)
-
+            
             if old_password != self._password:
-                logger.error("Incorrect old password.")
+                logger.error("update_password/ if old_password; raised error: Incorrect old password.")
                 raise ValueError("Incorrect old password.")
             elif new_pass is not None:
-                logger.error(ValueError)
+                logger.error("update_password/ elif new_pass; raised error: New passwords do not match.")
                 raise ValueError(new_pass)
-            elif new_password1 != new_password2:
-                logger.error("New passwords do not match.")
-                raise ValueError("New passwords do not match.")
+            # elif new_password1 != new_password2:
+            #     logger.error("update_password/ elif new_pass; raised error: New passwords do not match.")
+            #     raise ValueError("New passwords do not match.")
             elif len(new_password1) < 4:
-                logger.error("New password must be at least 4 characters long.")
+                logger.error("update_password/ elif len(new_password1); raised error: New password must be at least 4 characters long.")
                 raise ValueError("New password must be at least 4 characters long.")
             elif self.build_pass(new_password1) == old_password:
-                logger.error("New password must be different from the old password.")
+                logger.error("update_password/ elif self.build_pass; raised error: New password must be different from the old password.")
                 raise ValueError("New password must be different from the old password.")
             else:
                 self._password = self.build_pass(new_password1)
                 self.save_to_database()
-                logger.info("Password updated successfully.")
+                logger.info("update_password/ else; return message: Password updated successfully.")
                 return "\n>>>> Password updated successfully. <<<<\n"
            
         except ValueError as Err:
-            logger.error(Err)
+            logger.error("update_password/ except;  raised value error.")
             return str(Err)
-
-    def user_age(self):
-        today = datetime.datetime.today()
-        user_birth = datetime.datetime.strptime(self.date_of_birth, '%Y-%m-%d')
-        return (today - user_birth).days // 365
     
     @staticmethod
     def validate_newpass(pass1: str, pass2: str) -> str:
@@ -267,7 +299,7 @@ class User:
             message: new passwords match or not
         """
         if pass1 != pass2:
-            logger.error("New passwords do not match.")
+            logger.error("validate_newpass; raised error: New passwords do not match.")
             raise ValueError("New passwords do not match.")
         return None
 
@@ -283,8 +315,9 @@ class User:
                 "telephone_number": self.telephone_number,
                 "role": self.role.value,
             }
-            User.users[self.username] = user_data
-            json.dump(User.users, file, indent=4)
+            User._users[self.username] = user_data
+            json.dump(User._users, file, indent=4)
+            logger.info("save_to_database; users info saved to database.")
 
     @classmethod
     def load_from_database(cls) -> None:
@@ -293,10 +326,12 @@ class User:
         """
         try:
             with open("database.json", "r", encoding="utf_8") as file:
-                User.users = json.load(file)
+                User._users = json.load(file)
+                logger.info("load_from_database/ try; users info loaded from database.")
        
         except FileNotFoundError:
-            User.users = {}
+            User._users = {}
+            logger.info("load_from_database/ except; an empty users info dictionary created.")
             
     @staticmethod
     def validate_password(password: str) -> str:
@@ -307,14 +342,18 @@ class User:
             password: The password to be validated.
         """
         if len(password) < 4:
-            logger.error("New password must be at least 4 characters long.")
-            raise ValueError("New password must be at least 4 characters long.")
+            logger.info("validate_password;  return False.")
+            return False
+        logger.info("validate_password;  return True.")
+        return True
        
     @staticmethod
     def clear_screen():
         if platform.system() == "Windows":
+            logger.info("clear_screen/ if;  Windows screen cleared.")
             os.system("cls")    
         else:
+            logger.info("clear_screen/ else;  Linux screen cleared.")
             os.system("clear") 
          
     def is_birthday(self) -> bool:
@@ -322,17 +361,8 @@ class User:
         Check if it's the user's birthday today.
         """
         today = datetime.date.today()
+        logger.info("is_birthday;  user's birthday checked.")
         return today.month == self.date_of_birth.month and today.day == self.date_of_birth.day
-
-    
-    def calculate_membership_months(self) -> int:
-        """
-        Calculate the number of months the user has been a member.
-        """
-        today = datetime.date.today()
-        registration_date = self.registration_date
-        months_diff = (today.year - registration_date.year) * 12 + (today.month - registration_date.month)
-        return months_diff
     
     def apply_discount(self, original_price: float) -> float:
             """
@@ -340,9 +370,11 @@ class User:
             """
             if self.is_birthday():
                 final_price = original_price * 0.5
+                logger.info("apply_discount/ if;  user gets 50% discount for birthday.")
             else:
-                membership_months = self.calculate_membership_months()
+                membership_months = self.calculate_membership()
                 discount_percentage = membership_months * 0.1
                 discount_amount = original_price * discount_percentage
                 final_price = original_price - discount_amount
+                logger.info("is_birthday/ else;  user gets {discount_percentage}% discount for membership.")
             return final_price      
