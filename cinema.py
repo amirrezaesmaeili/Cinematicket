@@ -16,7 +16,7 @@ class MyException(Exception):
 class Cinema:
     id_counter = 0
     sans={}
-    def __init__(self,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int,ticket_price: float):
+    def __init__(self,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int):
         Cinema.id_counter += 1
         self.id = Cinema.id_counter
         self.film_name = film_name
@@ -24,7 +24,7 @@ class Cinema:
         self.film_play_time = film_play_time
         self.film_age_category = film_age_category
         self.capacity = capacity
-        self.ticket_price = ticket_price
+        self.ticket_price = 20_000
         
     def save_sans_to_file(self):
         with open("Cinema_sans.json","w",encoding="utf_8") as file:
