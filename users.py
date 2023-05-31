@@ -360,9 +360,13 @@ class User:
         """
         Check if it's the user's birthday today.
         """
-        today = datetime.date.today()
-        logger.info("is_birthday;  user's birthday checked.")
-        return today.month == self.date_of_birth.month and today.day == self.date_of_birth.day
+        today = dt.date.today()
+        user_birth = dt.datetime.strptime(self.birth, '%Y-%m-%d')
+        if today.month == user_birth.month and today.day == user_birth.day:
+            logger.info("is_birthday/ if;  user's birthday is today.")
+            return True
+        logger.info("is_birthday;  user's birthday is not today.")
+        return False
     
     def apply_discount(self, original_price: float) -> float:
             """
@@ -375,6 +379,6 @@ class User:
                 membership_months = self.calculate_membership()
                 discount_percentage = membership_months * 0.1
                 discount_amount = original_price * discount_percentage
-                final_price = original_price - discount_amount
-                logger.info("is_birthday/ else;  user gets {discount_percentage}% discount for membership.")
+                final_price = original_price - round(discount_amount, 2)
+                logger.info("apply_discount/ else;  user gets {discount_percentage}% discount for membership.")
             return final_price      
