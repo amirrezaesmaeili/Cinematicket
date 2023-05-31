@@ -23,7 +23,7 @@ class TestUser(TestCase):
         self.user_change_phone = User("John", "password",  self.birth, self.id, "submit_date", "1234")
         # self.user_change_pass = User("Alex", "password123")
         self.user_save_to_database = User("testuser", "password", self.birth, self.id, "submit_date", "1234567890")
-        self.cls = User
+        self.discount = User(self.username_user, self.password_user, self.birth, self.id, self.submit_date)
     
     def tearDown(self):
         User._users.clear()
@@ -176,29 +176,46 @@ class TestUser(TestCase):
     def test_sign_up(self):
         self.password = "password"
         self.role = "USER"
-        result = self.cls.sign_up(self.username_user, self.password, self.role, self.birth, self.telephone_number)
+        result = User.sign_up(self.username_user, self.password, self.role, self.birth, self.telephone_number)
         self.assertEqual(result, "Creating User")
 
         self.role = "ADMIN"
-        result = self.cls.sign_up(self.username_admin, self.password_admin, self.role, self.birth)
+        result = User.sign_up(self.username_admin, self.password_admin, self.role, self.birth)
         self.assertEqual(result, "Creating Admin")
 
         self.role = "MANAGER"
-        result = self.cls.sign_up(self.username_manager, self.password_manager, self.role, self.birth)
+        result = User.sign_up(self.username_manager, self.password_manager, self.role, self.birth)
         self.assertEqual(result, "Creating Manager")
 
         self.role = "USER"
         with self.assertRaises(ValueError):
-            self.cls.sign_up(self.username_user, "abc", self.role, self.birth)
+            User.sign_up(self.username_user, "abc", self.role, self.birth)
 
         self.role = "USER"
         with self.assertRaises(ValueError):
-            self.cls.sign_up(self.username_user, self.password_user, self.role, None)
+            User.sign_up(self.username_user, self.password_user, self.role, None)
 
         self.role = "USER"
-        self.cls._users = {self.username_user: {"password": "existing", "role": "USER", "birth": "1990-01-01"}}
+        User._users = {self.username_user: {"password": "existing", "role": "USER", "birth": "1990-01-01"}}
         with self.assertRaises(ValueError):
-            self.cls.sign_up(self.username_user, self.password_user, self.role, self.birth)
+            User.sign_up(self.username_user, self.password_user, self.role, self.birth)
+
+    def test_is_birthday(self):
+        birthday = User.is_birthday(self)
+        self.assertFalse(birthday)
+
+        self.birth = str(dt.date.today())
+        birthday = User.is_birthday(self)
+        self.assertTrue(birthday)
+
+    def test_apply_discount(self):
+        result = self.discount.apply_discount(30000)
+        self.assertEqual(result, 12000)
+
+        self.birth = str(dt.date.today())
+        self.discount = User(self.username_user, self.password_user, self.birth, self.id, self.submit_date)
+        result = self.discount.apply_discount(30000)
+        self.assertEqual(result, 15000)
 
 
 class TestCinema(TestCase):

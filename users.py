@@ -306,4 +306,27 @@ class User:
         if platform.system() == "Windows":
             os.system("cls")    
         else:
-            os.system("clear")        
+            os.system("clear")
+
+    def is_birthday(self) -> bool:
+        """
+        Check if it's the user's birthday today.
+        """
+        today = dt.date.today()
+        user_birth = dt.datetime.strptime(self.birth, '%Y-%m-%d')
+        if today.month == user_birth.month and today.day == user_birth.day:
+            return True
+        return False
+    
+    def apply_discount(self, original_price: float) -> float:
+            """
+            Apply a discount to the original price based on the user's membership and birthday.
+            """
+            if self.is_birthday():
+                final_price = original_price * 0.5
+            else:
+                membership_months = self.calculate_membership()
+                discount_percentage = membership_months * 0.1
+                discount_amount = original_price * discount_percentage
+                final_price = original_price - round(discount_amount, 2)
+            return final_price
