@@ -160,7 +160,7 @@ class User:
             return str(Err)
         
     @classmethod
-    def create_manager(cls, username: str, password: str, date_of_birth: datetime.date = None, role=UserRole.MANAGER) -> str:
+    def create_manager(cls, username: str, password: str, role=UserRole.MANAGER) -> str:
         try:
             password = cls.build_pass(password)
             birth = ""

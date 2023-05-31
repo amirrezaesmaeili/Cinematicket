@@ -230,7 +230,7 @@ def main():
                                         logger.info("while True/ elif choice 2/ elif user_choice 2/ if username/ while True/ \
                                 \nelif user_login_choice 4/ elif/ for/ if; number of seats to reserve entered.")
                                         try:
-                                            cinema_sans = Cinema(sans['film_name'], sans['film_genre'], sans['film_play_time'], sans['film_age_category'], sans['capacity'])
+                                            cinema_sans = Cinema(sans['film_name'], sans['film_genre'], sans['film_play_time'], sans['film_age_category'], sans['capacity'], 30_000)
                                             can_reserve = cinema_sans.can_reserve_sans(film_play_time, capacity)
                                             if can_reserve:
                                                 cinema_sans.capacity = int(cinema_sans.capacity)
@@ -239,6 +239,9 @@ def main():
                                                     cinema_sans.capacity -= capacity
                                                     cinema_sans.save_sans_to_file()
                                                     print(f"\n>>>> Seats reserved successfully. Remaining capacity: {cinema_sans.capacity} <<<<\n")
+                                                    final_price = user.apply_discount(cinema_sans.ticket_price)
+                                                    print(f"ticket price is {final_price}")
+                                                    
                                                     logger.info(f"while True/ elif choice 2/ elif user_choice 2/ if username/ while True/ \
                                 \nelif user_login_choice 4/ elif/ for/ if/ try/ if/ if capacity;\
                                 printed message: Seats reserved successfully. Remaining capacity: {cinema_sans.capacity}.")
