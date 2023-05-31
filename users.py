@@ -113,6 +113,7 @@ class User:
 
     @classmethod
     def create_user(cls, username: str, password: str, birth: str, telephone_number: str = None,role=UserRole.USER) -> str:
+
         """
         Create a new user and save it to the database.
 
@@ -129,12 +130,13 @@ class User:
             user.save_to_database()
             logger.info("create_user;  return message: Welcome : User created successfully.")
             return "\n>>>> Welcome : User created successfully. <<<<\n"
+
         except ValueError as Err:
             logger.error("create_user/ except;  raised value error.")
             return str(Err)
         
     @classmethod
-    def create_admin(cls, username: str, password: str,role=UserRole.ADMIN) -> str:
+    def create_admin(cls, username: str, password: str, date_of_birth:datetime.datetime = None,role=UserRole.ADMIN) -> str:
         """
         Create a new user and save it to the database.
 
@@ -152,12 +154,13 @@ class User:
             user.save_to_database()
             logger.info("create_admin;  return message: Welcome : Admin created successfully.")
             return "\n>>>> Welcome : Admin created successfully. <<<<\n"
+
         except ValueError as Err:
             logger.error("create_admin/ except;  raised value error.")
             return str(Err)
         
     @classmethod
-    def create_manager(cls, username: str, password: str,role=UserRole.MANAGER) -> str:
+    def create_manager(cls, username: str, password: str, date_of_birth: datetime.date = None, role=UserRole.MANAGER) -> str:
         try:
             password = cls.build_pass(password)
             birth = ""
@@ -167,6 +170,7 @@ class User:
             user.save_to_database()
             logger.info("create_manager;  return message: Welcome : Manager created successfully.")
             return "\n>>>> Welcome: Manager created successfully. <<<<\n"
+
         except ValueError as Err:
             logger.error("create_manager/ except;  raised value error.")
             return str(Err)
@@ -179,6 +183,7 @@ class User:
         birth = ""
         cls.sign_up(username, password, role, birth)
         logger.info("create_manager_from_args;  called signup function")
+
 
     @classmethod
     def get_manager_details(cls):
@@ -312,6 +317,7 @@ class User:
                 "id": self.id,
                 "username": self.username,
                 "password": self._password,
+                "birthday":self.date_of_birth,
                 "telephone_number": self.telephone_number,
                 "role": self.role.value,
             }

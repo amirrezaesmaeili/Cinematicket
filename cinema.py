@@ -16,7 +16,7 @@ class MyException(Exception):
 class Cinema:
     id_counter = 0
     sans={}
-    def __init__(self,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int):
+    def __init__(self,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int,ticket_price: float):
         Cinema.id_counter += 1
         self.id = Cinema.id_counter
         self.film_name = film_name
@@ -24,6 +24,7 @@ class Cinema:
         self.film_play_time = film_play_time
         self.film_age_category = film_age_category
         self.capacity = capacity
+        self.ticket_price = ticket_price
         
     def save_sans_to_file(self):
         with open("Cinema_sans.json","w",encoding="utf_8") as file:
@@ -33,7 +34,8 @@ class Cinema:
                 "film_genre": self.film_genre,
                 "film_play_time": self.film_paly_time,
                 "film_age_category": self.film_age_category,
-                "capacity": self.capacity
+                "capacity": self.capacity,
+                "ticket_price":self.ticket_price,
             }
             Cinema.sans[self.film_name] = sans_data
             json.dump(Cinema.sans,file,indent=4)
@@ -51,7 +53,7 @@ class Cinema:
             logger.info("load_sans_from_file/ except;  empty Cinema sans dictionary created.") 
             
     @classmethod
-    def create_sans(cls,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int):
+    def create_sans(cls,film_name: str,film_genre: str,film_play_time: str, film_age_category: int, capacity: int,ticket_price: float):
         try:
                 cinema_sans = cls(film_name,film_genre,film_play_time,film_age_category,capacity)
                 cinema_sans.save_sans_to_file()

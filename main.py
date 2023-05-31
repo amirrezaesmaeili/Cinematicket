@@ -15,6 +15,7 @@ def main():
     parser.add_argument("-m","--manager", action="store_true", help="Create an admin user")
     parser.add_argument('-u',"--username", type=str, help="Username")
     parser.add_argument('-p',"--password", type=str, help="Password")
+    parser.add_argument('-b',"--birthday", type=str, help="birthday")
     args = parser.parse_args()
     logger.info("args entered.")
 
@@ -72,7 +73,8 @@ def main():
                     film_play_time = input("Enter Film Playing Time In 00:00 Format: \n")
                     film_age_category = input("Enter Age Category Of The Film: \n")
                     capacity = input("Enter The Cinema Capacity: \n")
-                    message_create_sans = Cinema.create_sans(film_name,film_genre,film_play_time,film_age_category,capacity)
+                    ticket_price = input("Enter The Ticket Price: \n")
+                    message_create_sans = Cinema.create_sans(film_name,film_genre,film_play_time,film_age_category,capacity,ticket_price)
                     print(message_create_sans)
                     logger.info("while True/ elif manager_choice 2;  called create_sans")
                 
@@ -83,8 +85,10 @@ def main():
                     
             else:
                 print("You Have No Permissions")
-                User.clear_screen()
-                logger.info("while True/ elif choice 1/ if args/ else;  printed message: You Have No Permissions")
+
+            User.clear_screen()
+            logger.info("while True/ elif choice 1/ if args/ else;  printed message: You Have No Permissions")
+                
                 
         elif choice == "2":
             User.clear_screen()
@@ -105,16 +109,20 @@ def main():
                 User.clear_screen()
                 username = input("Enter a username: \n")
                 password = getpass.getpass("Enter a password (at least 4 characters): \n")
+
                 birth = input("Enter your burthday (yyyy-mm-dd): ")
+
+              
                 telephone_number = input("Enter Your Telephone Number In +98 Format: \n")
                 pattern = regex.compile(r"^\+98\d{10}$")
                 if not pattern.match(telephone_number):
                     raise ValueError("Phone number is invalid.")
+
                 role = "USER"
                 User.sign_up(username, password, role, birth, telephone_number)
                 print("\n>>>> Welcome : User created successfully. <<<<")
                 logger.info("while True/ elif choice 2/ elif user_choice 1;  printed message: Welcome : User created successfully.")
-                
+    
             
             elif user_choice == "2":
                 User.clear_screen()
@@ -123,6 +131,7 @@ def main():
                 User.load_from_database()
                 if username in User._users and User._users[username]["password"] == password:
                     logger.info("while True/ elif choice 2/ elif user_choice 2/ if username;  user logged in.")
+
                     while True:
                         print("User menu:")
                         print("1: View user information")
