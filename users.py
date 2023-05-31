@@ -5,6 +5,7 @@ from enum import Enum
 import os
 import platform
 import datetime as dt
+from argparse import Namespace
 
 class UserRole(Enum):
     MANAGER = "manager"
@@ -12,9 +13,9 @@ class UserRole(Enum):
     USER = "user"
 
 class User:
-    users = {}
+    _users = {}
 
-    def __init__(self, username: str, password: str, telephone_number= None,role=UserRole.USER) -> None:
+    def __init__(self, username: str, password: str, birth: str, id: str, submit_date: str, telephone_number= None,role=UserRole.USER) -> None:
         """
         Initialize a User object.
 
@@ -26,7 +27,7 @@ class User:
         self.username = username
         self._password = password
         self.birth = birth
-        self.submit_date = dt.date.today()
+        self.submit_date = submit_date
         self.telephone_number = telephone_number
         self.id = id
         self.role = role
@@ -90,7 +91,7 @@ class User:
         return p_hash.hexdigest()
 
     @classmethod
-    def create_user(cls, username: str, password: str, telephone_number: str = None,role=UserRole.USER) -> str:
+    def create_user(cls, username: str, password: str, birth: str, telephone_number: str = None,role=UserRole.USER) -> str:
         """
         Create a new user and save it to the database.
 
@@ -102,6 +103,7 @@ class User:
         try:
             password = cls.build_pass(password)
             id = str(uuid4())
+            submit_date = str(dt.date.today())
             user = cls(username, password, birth, id, submit_date, telephone_number,role=UserRole.USER)
             user.save_to_database()
             return "\n>>>> Welcome : User created successfully. <<<<\n"
@@ -120,7 +122,10 @@ class User:
         """
         try:
             password = cls.build_pass(password)
-            user = cls(username, password,role=UserRole.ADMIN)
+            birth = ""
+            id = str(uuid4())
+            submit_date = ""
+            user = cls(username, password, birth, id, submit_date, role=UserRole.ADMIN)
             user.save_to_database()
             return "\n>>>> Welcome : Admin created successfully. <<<<\n"
         except ValueError as Err:
@@ -130,7 +135,10 @@ class User:
     def create_manager(cls, username: str, password: str,role=UserRole.MANAGER) -> str:
         try:
             password = cls.build_pass(password)
-            user = cls(username, password, role=UserRole.MANAGER)
+            birth = ""
+            id = str(uuid4())
+            submit_date = ""
+            user = cls(username, password, birth, id, submit_date, role=UserRole.MANAGER)
             user.save_to_database()
             return "\n>>>> Welcome: Manager created successfully. <<<<\n"
         except ValueError as Err:
@@ -140,16 +148,16 @@ class User:
     def create_manager_from_args(cls, args):
         username = args.username
         password = args.password
-        role = "MANAGER"
-        cls.sign_up(username, password, role)
+        # role = "MANAGER"
+        # cls.create_manager(username, password, role)
 
-        # message_create_user = cls.create_manager(username, password, UserRole.MANAGER)
-        # print(message_create_user)
+        message_create_user = cls.create_manager(username, password, UserRole.MANAGER)
+        print(message_create_user)
 
     @classmethod
     def get_manager_details(cls):
         manager_username = None
-        for username, user_info in cls.users.items():
+        for username, user_info in cls._users.items():
             if user_info["role"] == UserRole.MANAGER.value:
                 manager_username = username
                 break
@@ -171,13 +179,13 @@ class User:
             message: the username was updated successfully.
         """
         try:
-            if self.username in User.users:
-                if new_username in User.users:
+            if self.username in User._users:
+                if new_username in User._users:
                     raise ValueError("This username already exists.")
                 else:
-                    User.users.pop(self.username)
+                    User._users.pop(self.username)
                     self.username = new_username
-                    User.users[new_username] = self
+                    User._users[new_username] = self
                     self.save_to_database()
                     return "\n>>>> Username updated successfully. <<<<\n"
             else:
@@ -266,8 +274,8 @@ class User:
                 "telephone_number": self.telephone_number,
                 "role": self.role.value,
             }
-            User.users[self.username] = user_data
-            json.dump(User.users, file, indent=4)
+            User._users[self.username] = user_data
+            json.dump(User._users, file, indent=4)
 
     @classmethod
     def load_from_database(cls) -> None:
@@ -276,10 +284,10 @@ class User:
         """
         try:
             with open("database.json", "r", encoding="utf_8") as file:
-                User.users = json.load(file)
+                User._users = json.load(file)
        
         except FileNotFoundError:
-            User.users = {}
+            User._users = {}
             
     @staticmethod
     def validate_password(password: str) -> str:
@@ -290,7 +298,8 @@ class User:
             password: The password to be validated.
         """
         if len(password) < 4:
-            raise ValueError("New password must be at least 4 characters long.")
+            return False
+        return True
        
     @staticmethod
     def clear_screen():

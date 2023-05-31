@@ -16,20 +16,21 @@ class TestUser(TestCase):
         self.password_admin = "password"
         self.username_manager = "manager"
         self.password_manager = "password"
-        self.user_update = User("old_username", "password")
-        self.user_change_phone = User("John", "password","1234")
-        # self.user_change_pass = User("Alex", "password123")
-        self.user_save_to_database = User("testuser", "password", "1234567890")
+        self.id = "id"
         self.birth = "1992-11-19"
         self.submit_date = dt.date(2022,11,19)
-        
+        self.user_update = User("old_username", "password", self.birth, self.id, "submit_date")
+        self.user_change_phone = User("John", "password",  self.birth, self.id, "submit_date", "1234")
+        # self.user_change_pass = User("Alex", "password123")
+        self.user_save_to_database = User("testuser", "password", self.birth, self.id, "submit_date", "1234567890")
+        self.cls = User
     
     def tearDown(self):
-        User.users.clear()
+        User._users.clear()
         
     def test_create_user(self):
         expected_output = "\n>>>> Welcome : User created successfully. <<<<\n"
-        actual_output = User.create_user(self.username_user, self.password_user)
+        actual_output = User.create_user(self.username_user, self.password_user, self.birth)
         self.assertEqual(actual_output, expected_output)
     
     def test_create_admin(self):
@@ -57,7 +58,7 @@ class TestUser(TestCase):
         manager_username = 'ali'
         expected_output = f"Manager Username: {manager_username}\n"
         
-        User.users = {manager_username: {"role": UserRole.MANAGER.value}}
+        User._users = {manager_username: {"role": UserRole.MANAGER.value}}
         
         with patch('builtins.print') as mock_print:
             User.get_manager_details()
@@ -65,7 +66,7 @@ class TestUser(TestCase):
         
        
     def test_update_username(self):
-            User.create_user("old_username", "password")
+            User.create_user("old_username", "password", self.birth)
             new_username = "username"
             result = self.user_update.update_username(new_username)
             self.assertEqual(result, "\n>>>> Username updated successfully. <<<<\n")
@@ -74,7 +75,7 @@ class TestUser(TestCase):
             result = self.user_update.update_username(new_username)
             self.assertEqual(result, "This username already exists.")
             
-            User.users.clear()
+            User._users.clear()
             new_username = "new_username"
             result = self.user_update.update_username(new_username)
             self.assertEqual(result, "The user does not exist.") 
@@ -116,9 +117,9 @@ class TestUser(TestCase):
 
         User.load_from_database()
 
-        self.assertIn("testuser", User.users)
+        self.assertIn("testuser", User._users)
 
-        user_data = User.users["testuser"]
+        user_data = User._users["testuser"]
 
         self.assertEqual(user_data["id"], user.id)
         self.assertEqual(user_data["username"], user.username)
@@ -148,31 +149,57 @@ class TestUser(TestCase):
         with open("database.json", "w", encoding="utf_8") as file:
             json.dump(user_data, file, indent=4)
 
-        User.users = {}
+        User._users = {}
 
         User.load_from_database()
 
-        self.assertEqual(User.users, user_data)
+        self.assertEqual(User._users, user_data)
         os.remove("database.json")
     
     def test_validate_password(self):
-        try:
-            User.validate_password("pass")
-        except ValueError:
-            self.fail("Valid password raised ValueError")
+        password = User.validate_password("abcd1234")
+        self.assertTrue(password)
 
+        password = User.validate_password("abc")
+        self.assertFalse(password)
+ 
+    def test_age_counter(self):
+        expected_output = 30
+        actual_output = User.age_counter(self)
+        self.assertEqual(actual_output, expected_output)
+
+    def test_calculate_membership(self):
+        expected_output = 6
+        actual_output = User.calculate_membership(self)
+        self.assertEqual(actual_output, expected_output)
+
+    def test_sign_up(self):
+        self.password = "password"
+        self.role = "USER"
+        result = self.cls.sign_up(self.username_user, self.password, self.role, self.birth, self.telephone_number)
+        self.assertEqual(result, "Creating User")
+
+        self.role = "ADMIN"
+        result = self.cls.sign_up(self.username_admin, self.password_admin, self.role, self.birth)
+        self.assertEqual(result, "Creating Admin")
+
+        self.role = "MANAGER"
+        result = self.cls.sign_up(self.username_manager, self.password_manager, self.role, self.birth)
+        self.assertEqual(result, "Creating Manager")
+
+        self.role = "USER"
         with self.assertRaises(ValueError):
-            User.validate_password("pa")
+            self.cls.sign_up(self.username_user, "abc", self.role, self.birth)
 
-        try:
-            User.validate_password("pass")
-        except ValueError:
-            self.fail("Valid password raised ValueError")
+        self.role = "USER"
+        with self.assertRaises(ValueError):
+            self.cls.sign_up(self.username_user, self.password_user, self.role, None)
 
-        try:
-            User.validate_password("password")
-        except ValueError:
-            self.fail("Valid password raised ValueError")
+        self.role = "USER"
+        self.cls._users = {self.username_user: {"password": "existing", "role": "USER", "birth": "1990-01-01"}}
+        with self.assertRaises(ValueError):
+            self.cls.sign_up(self.username_user, self.password_user, self.role, self.birth)
+
 
 class TestCinema(TestCase):
     
@@ -261,42 +288,6 @@ class TestCinema(TestCase):
 
 
         self.assertEqual(sans_list, list(Cinema.sans.values()))
-
-    def test_age_counter(self):
-        expected_output = 30
-        actual_output = User.age_counter(self)
-        self.assertEqual(actual_output, expected_output)
-
-    def test_calculate_membership(self):
-        expected_output = 6
-        actual_output = User.calculate_membership(self)
-        self.assertEqual(actual_output, expected_output)
-
-    def test_sign_up(self):
-        self.role = "USER"
-        result = self.cls.sign_up(self.username_user, self.password_user, self.role, self.birth, self.telephone_number)
-        self.assertEqual(result, "Creating User")
-
-        self.role = "ADMIN"
-        result = self.cls.sign_up(self.username_admin, self.password_admin, self.role, self.birth)
-        self.assertEqual(result, "Creating Admin")
-
-        self.role = "MANAGER"
-        result = self.cls.sign_up(self.username_manager, self.password_manager, self.role, self.birth)
-        self.assertEqual(result, "Creating Manager")
-
-        self.role = "USER"
-        with self.assertRaises(ValueError):
-            self.cls.sign_up(self.username_user, "abc", self.role, self.birth)
-
-        self.role = "USER"
-        with self.assertRaises(ValueError):
-            self.cls.sign_up(self.username_user, self.password_user, self.role, None)
-
-        self.role = "USER"
-        self.cls._users = {self.username_user: {"password": "existing", "role": "USER", "birth": "1990-01-01"}}
-        with self.assertRaises(ValueError):
-            self.cls.sign_up(self.username_user, self.password_user, self.role, self.birth)
 
 
 if __name__ == "__main__":
