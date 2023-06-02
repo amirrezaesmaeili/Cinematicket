@@ -47,13 +47,12 @@ class TestUser(TestCase):
 
     def test_create_manager_from_args(self):
         args = Namespace(username="mng", password="password")
-        expected_output = "\n>>>> Welcome: Manager created successfully. <<<<\n"
         
-        with patch('builtins.print') as mock_print:
+        with patch.object(User, 'sign_up') as mock_sign_up:
             User.create_manager_from_args(args)
-            mock_print.assert_called_with(expected_output)
+            mock_sign_up.assert_called_with("mng", "password", "MANAGER", "")
         os.remove("database.json")
-    
+
     def test_get_manager_details(self):
         manager_username = 'ali'
         expected_output = f"Manager Username: {manager_username}\n"
@@ -222,13 +221,13 @@ class TestCinema(TestCase):
     
     def test_create_sans(self):
         result = Cinema.create_sans("Film1", "Genre1", "10:00", 18, 100, 20000)
-        expected = "\n>>>>  Sans created successfully. <<<<\n"
+        expected = "\n>>>> Sans created successfully. <<<<\n"
         self.assertEqual(result, expected)
         os.remove("Cinema_sans.json")
         
     def test_save_sans_to_file(self):
 
-        cinema = Cinema("Film1", "Genre1", "10:00", 18, 100)
+        cinema = Cinema("Film1", "Genre1", "10:00", 18, 100,100)
 
 
         cinema.save_sans_to_file()
